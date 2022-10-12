@@ -1,0 +1,18 @@
+<div class="btn-group btn-group">
+    <a href="{% url print contract.Branch.id contract.id  %}" class="btn btn-default btn" rel="external" role="button">
+        Подготовить к печати
+        <span class="glyphicon glyphicon-print"></span>
+    </a>
+    <a href="{% url addobject contract.Branch.id contract.id %}" class="btn btn-success" role="button">
+        <span class="glyphicon glyphicon-plus"></span>
+        Добавить объект
+    </a>
+    <button type="button" class="btn btn-warning">
+        <span class="glyphicon glyphicon-asterisk"></span>
+        Групповые операции
+    </button>
+    <button type="button" class="btn btn-danger">
+        <span class="glyphicon glyphicon-minus"></span>
+        Удалить объект
+    </button>
+</div>

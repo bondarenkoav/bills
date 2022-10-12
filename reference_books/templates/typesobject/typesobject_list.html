@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}<a href="{% url 'reference_books:addget_typesobject' %}">Добавить</a>{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 35%;">Краткое наименование</th>
+                    <th style="width: 60%;">Полное наименование</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in list %}
+                    <tr id="obj_{{ item.id }}" onclick="location.href = '{% url 'reference_books:addget_typesobject' item.id %}';">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.ShortName }}</td>
+                        <td>{{ item.DescName }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

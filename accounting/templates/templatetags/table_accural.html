@@ -1,0 +1,25 @@
+<form method="post" action="{% url 'finance_department:change_accruals' id %}">
+    {% csrf_token %}
+    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+        <div class="modal-header">
+            <h4 class="modal-title">
+                <i class="fa fa-hashtag" aria-hidden="true"></i>
+                Объект №{{ num_object }}
+            </h4>
+        </div>
+        <div class="modal-body">
+            <p>
+                <i class="fa fa-map-marker" aria-hidden="true"></i>
+                {{ address }}
+            </p>
+            <div class="input-group">
+                <input type="text" class="form-control" value="{{ summa }}" name="summa">
+                <span class="input-group-addon">руб.</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="submit">Сохранить</button>
+            <a href="{% url 'finance_department:delete_accural' id %}" class="btn btn-danger" role="button">Удалить</a>
+        </div>
+    </div>
+</form>

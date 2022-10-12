@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load bootstrap4 other_tags mathfilters %}
+
+{% block content_title %}
+    {% if invoice_data %}
+        № {{ invoice_data.id }} от {{ invoice_data.date_invoice }}
+    {% else %}
+        Новая
+    {% endif %}
+{% endblock %}
+{% block content_area %}Складская накладная{% endblock %}
+{% block content_title_small %}{% get_nameclient branch_data.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-6 col-xs-12">
+            <form method="post" action="
+                {% if invoice_data %}
+                    {% url 'trade_department:addget_invoice' invoice_data.Branch.id invoice_data.id %}
+                {% else %}
+                    {% url 'trade_department:addget_invoice' branch_data.id %}
+                {% endif %}">
+                {% csrf_token %}
+                {% bootstrap_form form layout='horizontal' %}
+                {% buttons %}
+                    <a class="btn btn-danger" href="{% url 'index:card_client' branch_data.id %}" role="button">Вернуться к клиенту</a>
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                {% endbuttons %}
+            </form>
+        </div>
+        {% if invoice_data %}
+            <div class="col-sm-6 col-xs-12">
+                <div class="card" style="width: 100%">
+                    <div class="card-body">
+                        <h5 class="card-title">Привязанные накладные</h5>
+                        <div class="list-group">
+                            {% for item in children_invoices %}
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="fa fa-long-arrow-{% if item.type_invoice.slug == 'refund' %}down{% else %}up{% endif %}" aria-hidden="true"></i>
+                                    Накладная на {{ item.type_invoice }} №{{ item.number }} от {{ item.date_invoice }} на сумму {{ item.price|abs }} руб.
+                                </a>
+                            {% empty %}
+                                Нет дочерних накладных
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

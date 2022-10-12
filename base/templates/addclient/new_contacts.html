@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 %}
+
+{% block include_footer %}
+    <script src="{% static "js/jquery.mask.js" %}" type="text/javascript" ></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.phone_mobile').mask('(000) 000-0000', {placeholder: "(___) ___-____"});
+            $('.phone_stat').mask('(0000) 00-0000', {placeholder: "(____) __-____"});
+            $('.phone_stat_extra').mask('00000', {placeholder: "_____"});
+        });
+    </script>
+{% endblock %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="wrapper-page">
+        <div class="card">
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-2">ФИО*</div>
+                    <div class="col-3">Пояснение</div>
+                    <div class="col-2">Мобильный тел.*</div>
+                    <div class="col-2">Городской тел.</div>
+                    <div class="col-1">доб.</div>
+                    <div class="col-2">Эл. почта</div>
+                </div>
+                <div><hr/></div>
+                <form action="{% url 'contract_department:contact_add' branch_id %}" method="post" class="form">
+                    {% csrf_token %}
+                    {{ formset.management_form }}
+                    {% bootstrap_messages %}
+                    {% bootstrap_formset_errors formset layout='inline' %}
+                    {% for form in formset %}
+                        <div class="row">
+                            <div class="input-group">
+                                <div class="col-1 d-none d-xs-block">
+                                    {% bootstrap_field form.id layout='inline' %}
+                                </div>
+                                <div class="col-2">{% bootstrap_field form.Person_FIO layout='inline' %}</div>
+                                <div class="col-3">{% bootstrap_field form.Person_post layout='inline' %}</div>
+                                <div class="col-2">{% bootstrap_field form.Phone_mobile layout='inline' %}</div>
+                                <div class="col-2">{% bootstrap_field form.Phone_city layout='inline' %}</div>
+                                <div class="col-1">{% bootstrap_field form.Phone_city_extra layout='inline' %}</div>
+                                <div class="col-2">{% bootstrap_field form.Email layout='inline' %}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div><hr/></div>
+                    {% buttons %}
+                        {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                        <a class="btn btn-secondary" href="{% url 'contract_department:contact_add' branch_id %}" role="button">Добавить строку</a>
+                        <a class="btn btn-success" href="{% url 'index:card_client' branch_id %}" role="button">Завершить</a>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}<a href="{% url 'reference_books:addget_scompany' %}">Добавить</a>{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <td style="width: 5%;">#</td>
+                    <td style="width: 20%;">Полное наименование</td>
+                    <td style="width: 15%;">Краткое наименование</td>
+                    <td style="width: 10%;">ИНН/КПП</td>
+                    <td style="width: 15%;">Юридический адрес</td>
+                    <td style="width: 15%;">Почтовый адрес</td>
+                    <td style="width: 10%;">Руководитель</td>
+                    <td style="width: 10%;">Адрес эл.почты</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in list %}
+                    <tr id="obj_{{ item.id }}" onclick="location.href = '{% url 'reference_books:addget_scompany' item.id %}';">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.ServingCompany.NameCompany_full }}</td>
+                        <td>{{ item.ServingCompany.NameCompany_short }}</td>
+                        <td>{{ item.ServingCompany.INN }}/{{ item.KPP }}</td>
+                        <td>{{ item.ServingCompany.Address_reg }}</td>
+                        <td>{{ item.Address_post }}</td>
+                        <td>{{ item.Management_post }} {{ item.Management_name }}</td>
+                        <td>{{ item.Address_email }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'templatetags/pagination.html' with page_obj=list %}
+{% endblock %}

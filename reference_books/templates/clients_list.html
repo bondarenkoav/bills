@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load other_tags %}
+
+{% block content_title %}Контрагенты{% endblock %}
+{% block content_area %}Справочники{% endblock %}
+{% block content_title_small %}{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <div class="card-columns">
+            {% for item in list %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-2">
+                                <h5 class="card-title">{{ item.Client.TypeClient }}</h5>
+                            </div>
+                            <div class="col-10">
+                                <p class="card-text">{% get_nameclient item.id %}</p>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <small>ИНН{% if item.KPP %}/КПП{% endif %}: {{ item.Client.INN }}{% if item.KPP %}/{{ item.KPP }}{% endif %}</small>
+                        </div>
+                        <a href="{% url 'index:card_client' item.id %}" class="card-link">Открыть карточку</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% include 'templatetags/pagination.html' with page_obj=list %}
+{% endblock %}

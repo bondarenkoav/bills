@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load bootstrap4 other_tags smssend_tags %}
+
+{% block content_title %}Рассылка СМС-уведомлений должникам{% endblock %}
+{% block content_area %}Финансовый отдел{% endblock %}
+{% block content_title_small %}Дополнительные функции{% endblock %}
+
+{% block content %}
+    <div class="d-none d-sm-block d-print-none">
+        <form action="{% url 'finance_department:sendsms_debtors' %}" method="post" class="form-inline">
+            {% csrf_token %}
+            {% bootstrap_form form layout='inline' %}
+            {% bootstrap_button "Показать" button_type="submit" button_class="btn-primary" %}
+        </form>
+    </div>
+    <div class="table-responsive">
+        <form method="post" action="{% url 'finance_department:sendsms_debtors' %}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th width="5%">#</th>
+                        <th width="10%">Отправлять</th>
+                        <th width="35%">Клиент</th>
+                        <th width="10%">Номер</th>
+                        <th width="10%">Долг</th>
+                        <th width="30%">Результат</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% if logs %}
+                    {% for log in logs %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td></td>
+                            <td>{{ log.client_id.Client }}</td>
+                            <td>+7{{ log.phone|phone2numeric }}</td>
+                            <td>{{ log.summ_debt }}</td>
+                            <td>{% sms_status log.sms_id log.phone %}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    {% for sms in list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><input type="checkbox" name="tag[]" value="{{ forloop.counter }}" checked></td>
+                            <td>
+                                {% if sms.branch_name %}
+                                    {{ sms.branch_name }}
+                                {% else %}
+                                    {{ sms.client_name }}
+                                {% endif %}
+                                <input type="hidden" name="client_{{ forloop.counter }}" value="{{ sms.id }}"></td>
+                            <td>{{ sms.phone_sms }}<input type="hidden" name="phone_{{ forloop.counter }}" value="{{ sms.Phone }}"></td>
+                            <td>{{ sms.saldo }}<input type="hidden" name="summdebt_{{ forloop.counter }}" value="{{ sms.summ_debt }}"></td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">Итого: {{ list.count }} адресата</td>
+                        <td colspan="3"><button type="submit">Отправить</button></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+    </div>
+{% endblock %}

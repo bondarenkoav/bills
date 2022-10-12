@@ -1,0 +1,29 @@
+{% if results|length %}
+	<table class="table table-striped">
+    <caption class="text-right"><a href="{% url 'index:advanced_search' %}">расширенный поиск</a></caption>
+    <tr>
+		<td width="40%">Наименование</td>
+        <td width="10%">ИНН</td>
+        <td width="10%">Договор</td>
+		<td width="40%">Объект</td>
+	</tr>
+	{% for r in results %}
+        <tr id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'index:card_client' r.id %}')";>
+            <td>
+                {% if r.NameClient_full %}
+                    {{ r.NameClient_full }}
+                {% else %}
+                    {{ r.NameClient_short }}
+                {% endif %}
+            </td>
+            <td>{{ r.INN }}</td>
+            <td>{{ r.Contract_internal }} ({{ r.Contract_external }})</td>
+            <td>{{ r.Object }} ({{ r.Object_address }})</td>
+        </tr>
+	{% endfor %}
+	</table>
+{% else %}
+	<div class="note">
+	    Ни одного объекта не найдено, но Вы можете попытать счастья через <a href="{% url 'index:advanced_search' %}">расширенный поиск</a>.
+	</div>
+{% endif %}

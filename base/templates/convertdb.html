@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% block title %}Тест подключения БД MySQL{% endblock %}
+{% block body_title %}Тест подключения БД MySQL{% endblock %}
+{% block user_menu %}{{ login }}{% endblock %}
+
+{% block dop_css %}
+{% endblock %}
+
+{% block content %}
+    <p>status: {{ status }}</p>
+{% endblock %}
+

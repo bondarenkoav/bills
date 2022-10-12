@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 other_tags %}
+
+{% block content_title %}
+    {% if act_data %}
+        № {{ act_data.id }} от {{ contract_data.DateWork }}
+    {% else %}
+        Новый
+    {% endif %}
+{% endblock %}
+{% block content_area %}Акт ТО{% endblock %}
+{% block content_title_small %}на {% get_nameclient branch_data.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-6 col-xs-12">
+            <form action="{% if act_data %}{% url 'maintenance_service:addget_act' act_data.Branch.id act_data.id %}{% else %}{% url 'maintenance_service:addget_act' branch_data.id %}{% endif %}" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form layout='horizontal' %}
+                {% buttons %}
+                    <a class="btn btn-danger" href="{% url 'index:card_client' branch_data.id %}">Вернуться к клиенту</a>
+                    {% bootstrap_button "Сохранить договор" button_type="submit" button_class="btn-primary" %}
+                {% endbuttons %}
+            </form>
+        </div>
+    </div>
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+	<script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+{% endblock %}

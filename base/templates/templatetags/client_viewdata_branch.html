@@ -1,0 +1,86 @@
+<dl class="row">
+    <dt class="col-sm-5">Наименование филиала</dt>
+    <dd class="col-sm-7">
+        {% if branch.NameBranch %}
+            {{ branch.NameBranch }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Должность</dt>
+    <dd class="col-sm-7">
+        {% if branch.Management_post %}
+            {{ branch.Management_post }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">ФИО руководителя</dt>
+    <dd class="col-sm-7">
+        {% if branch.Management_name %}
+            {{ branch.Management_name }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Действует на основании</dt>
+    <dd class="col-sm-7">
+        {% if branch.PowersOffice_name %}
+            {{ branch.PowersOffice_name }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Номер документа основания</dt>
+    <dd class="col-sm-7">
+        {% if branch.PowersOffice_number %}
+            {{ branch.PowersOffice_number }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Срок действия доверенности</dt>
+    <dd class="col-sm-7">
+        {% if branch.PowersOffice_date %}
+            {{ branch.PowersOffice_date }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Юридический адрес</dt>
+    <dd class="col-sm-7">
+        {% if branch.Address_reg %}
+            {{ branch.Address_reg }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Почтовый адрес</dt>
+    <dd class="col-sm-7">
+        {% if branch.Address_post %}
+            {{ branch.Address_post }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Адрес эл.почты</dt>
+    <dd class="col-sm-7">
+        {% if branch.Address_email %}
+            {{ branch.Address_email }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">КПП</dt>
+    <dd class="col-sm-7">
+        {% if branch.KPP %}
+            {{ branch.KPP }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Стационарный тел.</dt>
+    <dd class="col-sm-7">
+        {% if branch.Phone_city %}
+            {{ branch.Phone_city }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Факс</dt>
+    <dd class="col-sm-7">
+        {% if branch.Phone_fax %}
+            {{ branch.Phone_fax }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">Мобильный тел.</dt>
+    <dd class="col-sm-7">
+        {% if branch.Phone_mobile %}
+            {{ branch.Phone_mobile }}
+        {% endif %}
+    </dd>
+    <dt class="col-sm-5">SMS тел.</dt>
+    <dd class="col-sm-7">
+        {% if branch.Phone_SMS %}
+            {{ branch.Phone_SMS }}
+        {% endif %}
+    </dd>
+</dl>

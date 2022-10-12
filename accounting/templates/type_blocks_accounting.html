@@ -1,0 +1,103 @@
+{% load bootstrap4 accounting_tags %}
+
+
+{% if massive_contract %}
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Документ</th>
+                <th>Начислено</th>
+                <th>Оплачено</th>
+                <th>Тип оплаты</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for dct in massive_contract %}
+                <th>{{ item. }}</th>
+                <th>{{ dct.NumContractInternal }} от {{ dct.DateConclusion }}</th>
+                <th>{{ item. }}</th>
+                <th>{{ item. }}</th>
+                <th>{{ item. }}</th>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+        </tfoot>
+    </table>
+{% endif %}
+
+
+{% comment %}
+<div class="accordion" id="accordion_{{ dct.TypeDocument.slug }}" style="margin: 15px 15px;">
+    {% if massive_contract %}
+        {% for dct in massive_contract %}
+            <h3>{{ dct.TypeDocument.app.Name }}</h3>
+            <div class="card">
+                <div class="card-header" id="heading{{ dct.TypeDocument.slug }}_{{ dct.id }}">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#{{ dct.TypeDocument.slug }}_{{ dct.id }}" aria-expanded="false" aria-controls="{{ dct.TypeDocument.slug }}_{{ dct.id }}">
+                            <span class="accordion-heading">
+                                {{ dct.TypeDocument.Name }} №{{ dct.NumContractInternal }} ({{ dct.NumContractBranch }})
+                            </span>
+                            <span class="balance">
+                                <strong>
+                                    {% if dct.id|balance_dct:dct.TypeDocument.slug %}Сальдо контракта: {{ dct.id|balance_dct:dct.TypeDocument.slug }}{% endif %}
+                                </strong>
+                            </span>
+                        </button>
+                    </h5>
+                </div>
+                <div id="{{ dct.TypeDocument.slug }}_{{ dct.id }}" class="collapse" aria-labelledby="heading{{ dct.TypeDocument.slug }}_{{ dct.id }}" data-parent="#accordion_{{ dct.TypeDocument.slug }}">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                {% views_table_accounting dct.Branch dct.ServingCompany dct.TypeDocument dct.id %}
+                            </div>
+                            <div class="col-6">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if massive_act %}
+        {% for dct in massive_act %}
+            <div class="card">
+                <div class="card-header" id="heading{{ dct.TypeDocument.slug }}_{{ dct.id }}">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#{{ dct.TypeDocument.slug }}_{{ dct.id }}" aria-expanded="false" aria-controls="{{ dct.TypeDocument.slug }}_{{ dct.id }}">
+                            <span class="accordion-heading">
+                                {{ dct.TypeDocument.Name }} №{{ dct.id }}
+                                {% if dct.Object %}{{ dct.Object }}{% else %}{{ dct.AddressObject }}{% endif %} от {{ dct.DateWork }}
+                            </span>
+                            <span class="balance">
+                                <strong>
+                                    Сальдо акта: {% if dct.Price %} {{ dct.Price }}{% else %}0{% endif %}руб.
+                                </strong>
+                            </span>
+                        </button>
+                    </h5>
+                </div>
+                <div id="{{ dct.TypeDocument.slug }}_{{ dct.id }}" class="collapse" aria-labelledby="heading{{ dct.TypeDocument.slug }}_{{ dct.id }}" data-parent="#accordion_{{ dct.TypeDocument.slug }}">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                {% views_table_accounting dct.Branch dct.ServingCompany dct.TypeDocument dct.id %}
+                            </div>
+                            <div class="col-6">
+                                <form action="{% url 'finance_department:payment' dct.Branch.id dct.ServingCompany.id dct.TypeDocument.id dct.id %}" method="post" class="form-inline">
+                                    {% csrf_token %}
+                                    {% bootstrap_form form_payment layout='inline' %}
+                                    {% bootstrap_button "Внести" button_type="submit" button_class="btn-primary" %}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>{% endcomment %}

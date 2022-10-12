@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}<a href="{% url 'reference_books:addget_group' %}">Добавить</a>{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 20%;">Наименование</th>
+                    <th style="width: 15%;">ФИО учредителя</th>
+                    <th style="width: 15%;">Сотовый телефон</th>
+                    <th style="width: 15%;">Городской телефон</th>
+                    <th style="width: 10%;">Факс</th>
+                    <th style="width: 10%;">Адрес эл.почты</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in list %}
+                    <tr id="obj_{{ item.id }}" onclick="location.href = '{% url 'reference_books:addget_group' item.id %}';">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.NameGroupClient }}</td>
+                        <td>{{ item.Founder_FIO }}</td>
+                        <td>{{ item.Phone_mobile }}</td>
+                        <td>{{ item.Phone_city }}</td>
+                        <td>{{ item.Phone_fax }}</td>
+                        <td>{{ item.Address_email }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'templatetags/pagination.html' with page_obj=list %}
+{% endblock %}

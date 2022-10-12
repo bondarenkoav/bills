@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content_title %}
+    {{ title }}
+    {% if contract %}{{ contract.NumContractInternal }} от {{ contract.DateConclusion }}{% endif %}
+{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}Экспорт в MSWord <button id="btn-export" onclick="exportHTML();">Экспорт</button>{% endblock %}
+
+{% block include_header %}
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" id="filename" value="{{ filename }}">
+    <textarea class="form-control" id="source_html" name="id_text_template">
+        {{ text }}
+    </textarea>
+    <script type="text/javascript">
+        CKEDITOR.replace( 'source_html' );
+        function exportHTML(){
+           var header = "<!DOCTYPE html><html xmlns:v='urn:schemas-microsoft-com:vml' xmlns:o='urn:schemas-microsoft-com:office:office'>"+
+                "<meta http-equiv='X-UA-Compatible' content='IE=Edge'><meta name='viewport' content='user-scalable=0,target-densitydpi=device-dpi'></head><body>";
+           var footer = "</body></html>";
+           var sourceHTML = header+CKEDITOR.instances.source_html.getData()+footer;
+           var filename = document.getElementById("filename").value;
+
+           var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+           var fileDownload = document.createElement("a");
+           document.body.appendChild(fileDownload);
+           fileDownload.href = source;
+           fileDownload.download = filename+'.doc';
+           fileDownload.click();
+           document.body.removeChild(fileDownload);
+        }
+{% comment %}        CKEDITOR.replace( 'id_text_template',
+                { on: {'instanceReady': function (evt) { evt.editor.execCommand('maximize'); }}}
+        );{% endcomment %}
+    </script>
+{% endblock %}

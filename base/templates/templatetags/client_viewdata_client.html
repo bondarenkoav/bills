@@ -1,0 +1,54 @@
+<dl class="row">
+    {% if branch.Client.TypeClient.slug == 'company' %}
+        <dt class="col-sm-5">ОКОПФ</dt>
+        <dd class="col-sm-7">{% if branch.Client.OKOPF %}{{ branch.Client.OKOPF }}{% endif %}</dd>
+    {% endif %}
+
+    <dt class="col-sm-5" class="col-sm-5">{% if branch.Client.TypeClient.slug == 'company' %}Полное наименование{% else %}ФИО{% endif %}</dt>
+    <dd class="col-sm-7" class="col-sm-7">
+        {% if branch.Client.NameClient_full %}
+            {{ branch.Client.NameClient_full }}
+        {% else %}
+            {{ branch.Client.NameClient_short }}
+        {% endif %}
+    </dd>
+
+    {% if branch.Client.TypeClient.slug == 'company' %}
+        <dt class="col-sm-5">Краткое наименование</dt>
+        <dd class="col-sm-7">{% if branch.Client.NameClient_short %}{{ branch.Client.NameClient_short }}{% endif %}</dd>
+
+        <dt class="col-sm-5">Должность руководителя</dt>
+        <dd class="col-sm-7">{% if branch.Client.Management_post %}{{ branch.Client.Management_post }}{% endif %}</dd>
+
+        <dt class="col-sm-5">ФИО руководителя</dt>
+        <dd class="col-sm-7">{% if branch.Client.Management_name %}{{ branch.Client.Management_name }}{% endif %}</dd>
+    {% endif %}
+
+    <dt class="col-sm-5">{% if branch.Client.TypeClient.slug == 'company' %}Юридический адрес{% else %}Адрес прописки{% endif %}</dt>
+    <dd class="col-sm-7">{% if branch.Client.Address_reg %}{{ branch.Client.Address_reg }}{% endif %}</dd>
+
+    <dt class="col-sm-5">ИНН</dt>
+    <dd class="col-sm-7">{% if branch.Client.INN %}{{ branch.Client.INN }}{% endif %}</dd>
+
+    {% if branch.Client.TypeClient.slug == 'company' or branch.Client.TypeClient.slug == 'businessman' %}
+        <dt class="col-sm-5">ОГРН</dt>
+        <dd class="col-sm-7">{% if branch.Client.OGRN %}{{ branch.Client.OGRN }}{% endif %}</dd>
+
+        <dt class="col-sm-5">ОКПО</dt>
+        <dd class="col-sm-7">{% if branch.Client.OKPO %}{{ branch.Client.OKPO }}{% endif %}</dd>
+
+        <dt class="col-sm-5">ОКВЭД</dt><dd class="col-sm-7">{% if branch.Client.OKVED %}{{ branch.Client.OKVED }}{% endif %}</dd>
+    {% endif %}
+
+    {% if branch.Client.TypeClient.slug == 'physical_person' or branch.Client.TypeClient.slug == 'businessman' %}
+        <dt class="col-sm-5">Серия и номер паспорта</dt><dd class="col-sm-7">{% if branch.Client.PassportSerNum %}{{ branch.Client.PassportSerNum }}{% endif %}</dd>
+        <dt class="col-sm-5">Дата выдачи паспорта</dt><dd class="col-sm-7">{% if branch.Client.DatePassport %}{{ branch.Client.DatePassport }}{% endif %}</dd>
+        <dt class="col-sm-5">Кем выдан пасспорт</dt><dd class="col-sm-7">{% if branch.Client.IssuedByPassport %}{{ branch.Client.IssuedByPassport }}{% endif %}</dd>
+        <dt class="col-sm-5">Почтовый адрес</dt><dd class="col-sm-7">{% if branch.Address_post %}{{ branch.Address_post }}{% endif %}</dd>
+        <dt class="col-sm-5">Адрес эл.почты</dt><dd class="col-sm-7">{% if branch.Address_email %}{{ branch.Address_email }}{% endif %}</dd>
+        <dt class="col-sm-5">Стационарный тел.</dt><dd class="col-sm-7"{% if branch.Phone_city %}>{{ branch.Phone_city }}{% endif %}</dd>
+        <dt class="col-sm-5">Факс</dt><dd class="col-sm-7">{% if branch.Phone_fax %}{{ branch.Phone_fax }}{% endif %}</dd>
+        <dt class="col-sm-5">Мобильный тел.</dt><dd class="col-sm-7">{% if branch.Phone_mobile %}{{ branch.Phone_mobile }}{% endif %}</dd>
+        <dt class="col-sm-5">SMS тел.</dt><dd class="col-sm-7">{% if branch.Phone_SMS %}{{ branch.Phone_SMS }}{% endif %}</dd>
+    {% endif %}
+</dl>

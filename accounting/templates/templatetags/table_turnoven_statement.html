@@ -1,0 +1,15 @@
+{% load mathfilters humanize other_tags %}
+
+<td>{% get_nameclient branch.id %}</td>
+<td class="text-center">
+    {{ sum_startbalance|floatformat:2|intcomma }}
+</td>
+<td class="text-center">
+    {{ summ_accural|floatformat:2|intcomma }}
+</td>
+<td class="text-center">
+    {{ summ_payment|abs|floatformat:2|intcomma }}
+</td>
+<td class="text-center">
+    {{ total|floatformat:2|intcomma }}
+</td>

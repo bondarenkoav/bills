@@ -1,0 +1,10 @@
+{% for item in planned %}
+    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ item.event_code.Name }}</h5>
+            <small>{{ item.add_date }}</small>
+        </div>
+        <p class="mb-1">{% if item.old_value == '' %}Добавлено{% else %}Изменено{% endif %}: {{ item.add_date }} пользователем {{ item.user.lastname }} {{ item.user.firstname }}</p>
+{#        <small>Donec id elit non mi porta.</small>#}
+    </a>
+{% endfor %}

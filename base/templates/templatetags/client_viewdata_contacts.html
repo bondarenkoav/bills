@@ -1,0 +1,25 @@
+{% for contact in contacts %}
+    <dl class="row">
+        {% if contact.Person_FIO %}
+            <dt class="col-sm-5">Фамилия Имя Отчество</dt>
+            <dd class="col-sm-7">{{ contact.Person_FIO }}</dd>
+        {% endif %}
+        {% if contact.Person_post %}
+            <dt class="col-sm-5">Должность</dt>
+            <dd class="col-sm-7">{{ contact.Person_post }}</dd>
+        {% endif %}
+        {% if contact.Phone_mobile %}
+            <dt class="col-sm-5">Мобильный телефон</dt>
+            <dd class="col-sm-7">{{ contact.Phone_mobile }}</dd>
+        {% endif %}
+        {% if contact.Phone_city %}
+            <dt class="col-sm-5">Городской телефон</dt>
+            <dd class="col-sm-7">{{ contact.Phone_city }}</dd>
+        {% endif %}
+        {% if contact.Address_residence %}
+            <dt class="col-sm-5">Адрес проживания</dt>
+            <dd class="col-sm-7">{{ contact.Address_residence }}</dd>
+        {% endif %}
+    </dl>
+    {% if contacts.lenght > forloop.counter %}<hr/>{% endif %}
+{% endfor %}

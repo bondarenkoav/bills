@@ -1,0 +1,11 @@
+<li>
+    {{ NameBranch }}
+    <span style="width: auto">
+        <i class="fa fa-rub"></i>
+        {% if sum_itogo %}
+            {{ sum_itogo }}
+        {% else %}
+            0.00
+        {% endif %}
+    </span>
+</li>

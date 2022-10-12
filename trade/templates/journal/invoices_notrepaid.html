@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load bootstrap4 trade_tags other_tags %}
+
+{% block content_title %}Накладные{% endblock %}
+{% block content_area %}Склад{% endblock %}
+{% block content_title_small %}Журнал{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr class="text-center">
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 10%;">Дата выдачи</th>
+                    <th style="width: 20%;">Номер</th>
+                    <th style="width: 55%;">Клиент</th>
+                    <th style="width: 10%;">Общая сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in list %}
+                <tr id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'trade_department:addget_invoice' item.Branch.id item.id %}')">
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td class="text-center">{{ item.date_invoice }}</td>
+                    <td class="text-center">{{ item.number }}</td>
+                    <td class="text-right">{% get_nameclient item.Branch.id %}</td>
+                    <td class="text-center">{{ item.id|total_invoice }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

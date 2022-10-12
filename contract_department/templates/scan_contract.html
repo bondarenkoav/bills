@@ -1,0 +1,23 @@
+{% load bootstrap4 %}
+{% load static %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">Договор</div>
+    <div class="panel-body">
+        {% if file %}
+            <a href="{% url urlstr contract.Branch.id contract.id file.id %}" target="_blank" title="Скан договора {{ contract.NumContractInternal }} от {{ contract.DateConclusion }}">Сканированный файл договора {{ contract.NumContractInternal }} от {{ contract.DateConclusion }}</a>
+        {% else %}
+            <form action="{% url urlstr contract.Branch.id contract.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-10">{% bootstrap_form form_scancontract layout='horizontal' %}</div>
+                    <div class="col-sm-2">
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary">Загрузить</button>
+                        {% endbuttons %}
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>

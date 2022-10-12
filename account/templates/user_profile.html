@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 %}
+
+{% block body_title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+<body>
+    <div class="page-header">
+        <h1>{{ user.last_name }} {{ user.first_name }}<small> {{ profile_post }} ({{ group }})</small></h1>
+    </div>
+
+    <div class="col-md-8 col-xs-12">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#home" data-toggle="tab">Главная</a></li>
+            <li><a href="#notification" data-toggle="tab">Сообщения</a></li>
+            <li><a href="#messages" data-toggle="tab">Уведомления</a></li>
+            <li><a href="#tasks" data-toggle="tab">Задачи</a></li>
+            <li><a href="#settings" data-toggle="tab">Настройки</a></li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="home" style="padding-top: 5px;">
+                <div class="row" style="">
+                    <div class="col-md-3 col-xs-4">
+                        <img src="{% static profile_photo %}" class="img-thumbnail" style="width: 100%"/>
+                    </div>
+                    <div class="col-md-9 col-xs-8">
+                        <form action="/account/profile/base/" method="post">
+                            {% csrf_token %}
+                            {% bootstrap_form form_base layout='horizontal' %}
+                            <div class="text-right">
+                                {% buttons %}
+                                    <button type="submit" class="btn btn-primary" style="margin-top: 10px; text-align: right">
+                                         Сохранить изменения
+                                    </button>
+                                {% endbuttons %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="profile">...</div>
+            <div class="tab-pane" id="notification">...</div>
+            <div class="tab-pane" id="messages">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <td>№ п/п</td>
+                            <td>Заголовок</td>
+                            <td>Отправител</td>
+                            <td>Дата создания</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in message_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ item.title }}</td>
+                                <td>{{ item.sender }}</td>
+                                <td>{{ item.DateTime_add }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="tasks">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <td>№ п/п</td>
+                            <td>Задача поставлена</td>
+                            <td>Заголовок</td>
+                            <td>Дата создания</td>
+                            <td>Ответственный</td>
+                            <td>Выполнена</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in task_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    {% if item.Create_user == auth_user %}
+                                        Вами
+                                    {% else %}
+                                        Вам
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.title }}</td>
+                                <td>{{ item.DateTime_add }}</td>
+                                <td>{{ item.responsible }}</td>
+                                <td>{{ item.done }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane" id="settings">
+                <div class="row">
+                    <div class="col-md-5 col-xs-10">
+                        {% if permissions_group %}
+                            <h2>
+                                Настройки доступа для группы пользователя
+                            </h2>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td>#</td>
+                                        <td>Наименование</td>
+                                        <td>Просмотр</td>
+                                        <td>Добавление</td>
+                                        <td>Изменение</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in permissions_group %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ item.operation }}</td>
+                                            <td>{{ item.view }}</td>
+                                            <td>{{ item.add }}</td>
+                                            <td>{{ item.update }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            Групповые права не заполнены!
+                        {% endif %}
+                    </div>
+                    <div class="col-md-1 col-xs-2">
+                        <a href="{% url 'accounts:copy_permissions_group_to_user' %}" ><i class="fa fa-arrow-right fa-5x" aria-hidden="true"> </i></a>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
+                        {% if permissions_user %}
+                            <h2>
+                                Настройки доступа для пользователя
+                            </h2>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td>#</td>
+                                        <td>Наименование</td>
+                                        <td>Просмотр</td>
+                                        <td>Добавление</td>
+                                        <td>Изменение</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in permissions_user %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ item.operation }}</td>
+                                            <td>{{ item.view }}</td>
+                                            <td>{{ item.add }}</td>
+                                            <td>{{ item.update }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            Права пользователя не заполнены! Нажмите > для копирования групповых прав.
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

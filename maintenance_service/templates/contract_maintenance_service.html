@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load bootstrap4 other_tags %}
+
+{% block content_title %}
+    {% if contract_data %}
+        № {{ contract_data.NumContractInternal }} от {{ contract_data.DateConclusion }}
+    {% else %}
+        Новый
+    {% endif %}
+{% endblock %}
+{% block content_area %}Договор ТО{% endblock %}
+{% block content_title_small %}на {% get_nameclient branch_data.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-5 col-xs-12">
+
+            <ul class="nav nav-tabs" id="card_datacontract" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="contract-tab" data-toggle="tab" href="#contract" role="tab" aria-controls="contract" aria-selected="true">Основные данные</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="sub_contract-tab" data-toggle="tab" href="#sub_contract" role="tab" aria-controls="sub_contract" aria-selected="false">Доп. соглашения</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="scan_documents-tab" data-toggle="tab" href="#scan_documents" role="tab" aria-controls="sub_contract" aria-selected="false">Сканированные документы</a>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3" id="TabContentDataClient">
+                <div class="tab-pane fade show active" id="contract" role="tabpanel" aria-labelledby="contract-tab">
+                    {% if file_scan_contract == None %}
+                        <div class="alert alert-danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            Необходимо загрузить сканированную копию договора.
+                        </div>
+                    {% endif %}
+
+                    <form action="{% if contract_data %}{% url 'maintenance_service:addget_contract' contract_data.Branch.id contract_data.id %}{% else %}{% url 'maintenance_service:addget_contract' branch_data.id %}{% endif %}" method="post" class="form">
+                        {% csrf_token %}
+                        {% bootstrap_form_errors form %}
+                        {% bootstrap_field form.ServingCompany layout='horizontal' %}
+                        <div class="form-group row">
+                            <div class="col-4" style="padding-top: 5px;">
+                                {% bootstrap_label "Номер внутренний/клиентский" label_for="NumContractInternal" %}
+                            </div>
+                            <div class="col-4">
+                                {% bootstrap_field form.NumContractInternal layout='inline' %}
+                            </div>
+                            <div class="col-4">
+                                {% bootstrap_field form.NumContractBranch layout='inline' %}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-4" style="padding-top: 5px;">
+                                {% bootstrap_label "Дата заключения/расторжения" label_for="DateConclusion" %}
+                            </div>
+                            <div class="col-4">
+                                {% bootstrap_field form.DateConclusion layout='inline' %}
+                            </div>
+                            <div class="col-4">
+                                {% bootstrap_field form.DateTermination layout='inline' %}
+                            </div>
+                        </div>
+                        {% bootstrap_field form.TemplateDocuments layout='horizontal' %}
+                        {% bootstrap_field form.PaymentDate layout='horizontal' %}
+                        <div class="form-group row">
+                            <div class="col-4" style="padding-top: 5px;">
+                                {% bootstrap_label "Периодичность начислений" label_for="DateConclusion" %}
+                            </div>
+                            <div class="col-8">
+                                {% for choice in form.PereodicAccrualMonth %}
+                                    <div class="form-check-inline" {% if forloop.counter0 == 0 %}style="margin-left: 0px;"{% endif %}>
+                                        {% bootstrap_label choice %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% bootstrap_field form.PereodicService layout='horizontal' %}
+                        {% bootstrap_field form.PushToAccounts layout='horizontal' %}
+                        {% bootstrap_field form.NameOfService layout='horizontal' %}
+                        {% bootstrap_field form.Notes layout='horizontal' %}
+                        {% buttons %}
+                            <a class="btn btn-warning" href="{% url 'index:card_client' branch_data.id %}" role="button">Вернуться к клиенту</a>
+                            {% bootstrap_button "Сохранить договор" button_type="submit" button_class="btn-primary" %}
+                            {% if contract_data %}
+                                <a class="btn btn-primary" href="{% url 'maintenance_service:print_contract' contract_data.Branch.id contract_data.id %}" role="button">
+                                    <i class="fa fa-print"></i>
+                                </a>
+                                <a class="btn btn-success" href="{% url 'maintenance_service:addget_object' contract_data.Branch.id contract_data.id %}" role="button">
+                                    Добавить объект
+                                </a>
+                                <a class="btn btn-warning" href="{% url 'maintenance_service:copy_objects' contract_data.id %}" role="button">
+                                    <i class="fa fa-copy"></i>
+                                </a>
+                            {% endif %}
+                        {% endbuttons %}
+                    </form>
+
+                    {% if contract_data %}
+                        <div class="alert alert-secondary" role="alert">
+                            <p>Стоимость оказания услуг:</p>
+                            <dl class="row">
+                                <dt class="col-sm-5">Все объекты: </dt><dd class="col-sm-7">{% if SumPriceAllObject.price %}{{ SumPriceAllObject.price }}{% else %}0,00{% endif %} рублей</dd>
+                                <dt class="col-sm-5">Обслуживается: </dt><dd class="col-sm-7">{% if SumPriceServices.price %}{{ SumPriceServices.price }}{% else %}0,00{% endif %} рублей</dd>
+                            </dl>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade show" id="sub_contract" role="tabpanel" aria-labelledby="sub_contract-tab">
+                    {% if contract_data %}
+                        <div>
+                            <a href="{% url 'maintenance_service:addget_subcontract' contract_data.Branch.id contract_data.id %}" class="list-group-item">Добавить дополнительное соглашение</a>
+                        </div>
+                        <hr/>
+                        <div class="list-group">
+                            {% for item in list_subcontracts %}
+                                <a href="{% url 'maintenance_service:addget_subcontract' contract_data.Branch.id contract_data.id item.id %}" class="list-group-item">Дополнительное соглашение №{{ item.NumSubContract }} {{ item.Template.NameTemplate }} от {{ item.DateSubContract }}</a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Для добавления дополнительного соглашения, необходимо сохранить основной договор.</p>
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade show" id="scan_documents" role="tabpanel" aria-labelledby="scan_documents-tab">
+                    {% if contract_data %}
+                        {% include "scan_contract.html" with urlstr='maintenance_service:addget_scan_contract' form=form_scan_contract contract=contract_data file=file_scan_contract %}
+                        {% include "scan_subcontract.html" with urlstr='maintenance_service:addget_scan_subcontract' form=form_scan_subcontract branch=contract_data.Branch.id contract=contract_data.id file=file_scan_contract.id %}
+{#                        {% include "scan_object.html" with urlstr='maintenance_service:addget_scan_certofownership' form=form_scan_object branch=contract_data.Branch.id contract=contract_data.id file=file_scan_contract.id %}#}
+                    {% else %}
+                        <p>Для добавления сканов документов, необходимо сохранить основной договор.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-7 col-xs-12">
+            {% if contract_data %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr class="text-center">
+                            <th width="5%">#</th>
+                            <th width="5%">Тип</th>
+                            <th width="20%">Наименование объекта</th>
+                            <th width="30%">Адрес объекта</th>
+                            <th width="10%">ФО</th>
+                            <th width="10%">Стоимость</th>
+                            <th width="10%">Обслуживается</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for object in objects %}
+                        <tr class="{{ object.NameClassBootstrap }}" id="obj_{{ object.id }}" onclick="location.href = '{% url 'maintenance_service:addget_object' contract_data.Branch.id contract_data.id object.id %}';">
+                            <td>{{ forloop.counter|add:page_add }}</td>
+                            <td>{{ object.TypeObject.ShortName }}</td>
+                            <td>{{ object.NameObject }}</td>
+                            <td>{{ object.AddressObject }}</td>
+                            <td class="text-center">{{ object.PaymentMethods }}</td>
+                            <td class="text-center">{{ object.Price }}</td>
+                            <td class="text-center">
+                                {% if object.DateEnd != '' %}
+                                    {{ object.DateEnd|date:"d.m.Y" }}
+                                {% else %}
+                                    Не смонтировано
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% include 'templatetags/pagination.html' with page_obj=objects %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static dashboard_tags %}
+
+{% block content_title %}Рабочий стол{% endblock %}
+{% block content_area %}Начало{% endblock %}
+{% block content_title_small %}Рабочий стол{% endblock %}
+
+{% block content %}
+    <div class="main-content-inner">
+        {% for name in group %}
+            {% if name == 'leaders' %}
+                {% include 'templatetags/desktop_leaders.html' with user=user %}
+            {% elif name == "admins" %}
+                {% include 'templatetags/desktop_admins.html' with user=user %}
+            {% elif name == 'managers' %}
+                {% include 'templatetags/desktop_managers.html' with user=user %}
+            {% elif name == 'accountants' %}
+                {% include 'templatetags/desktop_accounting.html' with user=user %}
+            {% else %}
+                Ничего
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

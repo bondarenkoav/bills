@@ -1,0 +1,9 @@
+{% load accounting_tags mathfilters humanize other_tags %}
+
+<td class="text-center">
+    {% if summa_accrual %}{{ summa_accrual|floatformat:2|intcomma }}{% else %}0{% endif %}
+</td>
+<td class="text-center">
+    {% if summa_paids %}{{ summa_paids|floatformat:2|intcomma }}{% else %}0{% endif %}
+</td>
+{#<td class="text-center"></td>#}

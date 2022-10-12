@@ -1,0 +1,41 @@
+{% load mathfilters accounting_tags humanize %}
+
+{% for account in accounting_data %}
+    <tr class="text-center">
+        <th>
+            {{ account.date_event|date:"d.m.Y" }}
+        </th>
+        <td>
+            {% if account.type_dct %}
+                {{ account.type_dct.ShortName }} №{{ account.dct|get_document }}
+            {% endif %}
+        </td>
+        <td>
+            {% if account.summ > 0 and account.payment_methods == None %}
+                {% if account.type_dct.type == 'contract' %}
+                    <a href="{% url "finance_department:view_accurals" branch_id scompany_id account.dct account.date_event|date:"Ymd" %}" {% comment %}data-toggle="tooltip" data-placement="right" title="{{ account.dct|list_objects:account.date_event }}"{% endcomment %}>
+                        {{ account.summ|intcomma }}
+                    </a>
+                {% else %}
+                    <a href="{% url "finance_department:view_accurals" branch_id scompany_id account.dct account.date_event|date:"Ymd" %}">{{ account.summ|intcomma }}</a>
+                {% endif %}
+            {% endif %}
+        </td>
+        <td>
+            {% if account.payment_methods %}
+{#                {% if account.summ < 0 or  %}#}
+                    <a href="{% url "finance_department:view_payment" branch_id scompany_id account.id %}">
+                        {{ account.summ|abs|intcomma }} <sup>{{ account.payment_methods }}</sup>
+                    </a>
+{#                {% else %}#}
+{#                    <span class="text-muted">{{ account.summ|abs|intcomma }} <sup>{{ account.payment_methods }}</sup></span>#}
+{#                {% endif %}#}
+            {% endif %}
+        </td>
+        {% if forloop.first %}
+            <td rowspan="{{ accounting_data|length }}">
+                {{ saldo_day|intcomma }}
+            </td>
+        {% endif %}
+    </tr>
+{% endfor %}

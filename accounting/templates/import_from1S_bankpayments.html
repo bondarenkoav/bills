@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load bootstrap4 accounting_tags other_tags humanize %}
+
+{% block content_title %}Список объектов попавших в выгрузку{% endblock %}
+{% block content_area %}Финансовый отдел{% endblock %}
+{% block content_title_small %}Интеграция с 1С{% endblock %}
+
+{% block content %}
+    <div class="d-none d-sm-block d-print-none">
+        <form action="{% url 'finance_department:import_from1C_bankpayments' %}" method="post" class="form-inline">
+            {% csrf_token %}
+            {% bootstrap_form form layout='inline' %}
+            {% buttons %}
+                {% bootstrap_button "Показать" button_type="submit" button_class="btn-primary" %}
+            {% endbuttons %}
+        </form>
+    </div>
+    {% if payments %}
+        <div>
+            <form action="{% url 'finance_department:import_from1C_bankpayments_run' %}" method="post" class="form-inline">
+                {% csrf_token %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr class="text-center">
+                                <th width="5%">
+                                    №п/п
+                                    <input type="hidden" name="date_entry" value="{{ date_entry|date:"Y-m-d" }}">
+                                    <input type="hidden" name="scompany_id" value="{{ scompany.id }}">
+                                </th>
+                                <th width="5%">Дата</th>
+                                <th width="25%">Контрагент (импорт)</th>
+                                <th width="10%">Договор (импорт)</th>
+                                <th width="10%">Сумма, руб.</th>
+                                <th width="45%">Контрагент (Биллинг)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in payments %}
+                                <tr>
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td class="text-center">{{ item.date_entry|date:"d.m.Y" }}</td>
+                                    <td class="text-right">{{ item.client_name }}<br/><small>ИНН: {{ item.client_inn }}</small></td>
+                                    <td class="text-center">{{ item.contract_number }} от {{ item.contract_date|date:'d.m.Y' }}</td>
+                                    <td class="text-center">{{ item.summ }}</td>
+                                    <td {% if item.contract_number == '' %}class="bg-warning"{% endif %}>
+                                        {% get_client_forpayments item.id forloop.counter %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="5" class="text-center h3">Итого: {{ total_payments.summ|floatformat:2 }} руб.</th>
+                                <th class="float-right">{% bootstrap_button "Перенести" button_type="submit" button_class="btn-success" %}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+{% endblock %}

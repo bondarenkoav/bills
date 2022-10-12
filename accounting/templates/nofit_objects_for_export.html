@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load accounting_tags %}
+
+{% block body_title %}
+    Список объектов не попавших в выгрузку
+{% endblock %}
+
+{% block content %}
+    <div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr class="text-center">
+                        <td width="5">№п/п</td>
+                        <td width="10">ИНН</td>
+	                    <td width="20">Собственник</td>
+                        <td width="10">№ Договора</td>
+            	        <td width="30">Объект</td>
+                        <td width="25">Причина</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in objects_nofit %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>{{ item.inn }}</td>
+                            <td>
+                                {% if item.name_branch %}
+                                    {{ item.name_branch }}
+                                {% else %}
+                                    {{ item.name_client }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.numcontract_internal %}
+                                    {{ item.numcontract_internal }}
+                                {% else %}
+                                    {{ item.numcontract_external }}
+                                {% endif %}
+                                от {{ item.date_conclusion }}
+                            </td>
+                            <td>{{ item.name_object }} ({{ item.address_object }})</td>
+                            <td>
+                                {% if item.inn == '' or item.inn == None %}
+                                    <i class="fa fa-exclamation" aria-hidden="true"> Отсутствует ИНН</i>
+                                {% elif item.typeclient_slug == 'company' and item.inn|length_is:"10" == False %}
+                                    <i class="fa fa-exclamation" aria-hidden="true"> Не верная длина ИНН (10 знаков)</i>
+                                {% elif item.typeclient_slug == 'businessman' or item.typeclient_slug == 'physical_person' %}
+                                    {% if item.inn|length_is:"12" == False %}
+                                        <i class="fa fa-exclamation" aria-hidden="true"> Не верная длина ИНН (12 знаков)</i>
+                                    {% endif %}
+                                {% endif %}
+                                {% if item.price <= 0 %}
+                                    <i class="fa fa-exclamation" aria-hidden="true"> Сумма абонентской платы меньше, либо равна нулю</i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body_title %}Список договоров со сроком окончания действия{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+
+            <thead>
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 30%">Контрагент</th>
+                    <th style="width: 15%">Договор</th>
+                    <th style="width: 50%">Недочёты</th>
+                </tr>
+            </thead>
+
+            {% for item in list %}
+                <tbody>
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            {% if item.NameBranch != '' %}
+                                {{ item.NameBranch }}
+                            {% else %}
+                                {{ item.NameClient_full }}
+                            {% endif %}
+                        </td>
+                        <td>{{ item.Name }}<br/>{{ item.NumContract }} от {{ item.DateConclusion }}</td>
+                        <td>{{ item.id|error_contracts:item.TypeDocument_id }}</td>   {% comment %}|error_contracts:item.TypeDocument_id{% endcomment %}
+                    </tr>
+                </tbody>
+            {% endfor %}
+
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block pagination %}
+    {% include 'paginator.html' with massive_pages=contracts urlstr="contract_department:get_notcomplete_contracts" %}
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% block head_content %}
+    <link href="{% static "css/select2.min.css" %}" rel="stylesheet" />
+    <script src="{% static "js/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <script type="text/javascript">
+        $(".js-example-basic-multiple").select2();
+        function DisplayDoneDescription(){
+            var check = document.getElementById('id_done');
+            if(check.checked) {
+                document.getElementById('id_done_description').required=true;
+                document.getElementById('id_done_description').disabled='';
+            }
+            else{
+                if(document.getElementById('id_done_description').value==''){
+{#                    document.getElementById('id_done').checked='checked';#}
+                    document.getElementById('id_done_description').required=false;
+                    document.getElementById('id_done_description').disabled='disabled';
+                }
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block body_title %}
+    {% if task_id == None %}
+        Новая задача
+    {% else %}
+        Задача
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="col-xs-12">
+        <form action="/tasks/item/{{ task_id }}/" method="post" class="form">
+            {% csrf_token %}
+            {% bootstrap_form form layout='horizontal' %}
+            {% buttons %}
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                    Сохранить ->
+                </button>
+            {% endbuttons %}
+        </form>
+
+    </div>
+{% endblock %}
+

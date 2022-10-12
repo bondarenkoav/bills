@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 %}
+
+{% block dop_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/suggestions-15.12.css" %}"  />
+{% endblock %}
+
+{% block body_title %}Добавление новой обслуживающей компании{% endblock %}
+
+{% block content %}
+
+    <div class="col-lg-6 col-md-6 col-sm-8 col-xs-12 col-md-offset-2 text-center">
+        <div class="panel panel-default">
+            <div class="panel-heading">Обслуживающая компания</div>
+            <div class="panel-body">
+
+                <div class="row" style="margin-bottom: -20px;">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
+                        <p>Введите ИНН и выберите клиента:</p>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                        <input id="party" class="form-control" name="party" type="text" placeholder="Введите ИНН адрес организации" value="{{ inn }}"/>
+                    </div>
+                </div>
+                <div>{{ client_id }}</div>
+                <hr style="margin-bottom: -5px;"/>
+                <form action="/add_serving_company/" method="post" class="form">
+                    {% csrf_token %}
+                    {% bootstrap_form formset layout='horizontal' %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                             Сохранить и перейти Далее ->
+                        </button>
+                    {% endbuttons %}
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block dop_js %}
+    <script type="text/javascript" src="{% static "js/jquery.suggestions-15.12.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/DaData.js" %}"></script>
+{% endblock %}

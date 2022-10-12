@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load bootstrap4 accounting_tags mathfilters humanize other_tags %}
+
+{% block content_title %}Оборотная ведомость по подразделениям{% endblock %}
+{% block content_area %}Финансовый отдел{% endblock %}
+{% block content_title_small %}Отчеты{% endblock %}
+
+{% block content %}
+    <div class="d-none d-sm-block d-print-none">
+        <form action="{% url 'finance_department:report_turnover_statement_forunits' %}" method="post" class="form-inline">
+            {% csrf_token %}
+            {% bootstrap_form form layout='inline' %}
+            {% bootstrap_button "Показать" button_type="submit" button_class="btn-primary" %}
+        </form>
+    </div>
+    <div class="table-responsive">
+        <h6></h6>
+        <table class="table table-hover">
+            {% if list_objects %}
+            <thead>
+                <tr class="text-center">
+                    <th colspan="6">Оборотная ведомость по {{ scompany }} за период: {{ select_month }}.{{ select_year }}</th>
+                </tr>
+                <tr class="text-center">
+                    <th style="width: 35%;">Контрагент</th>
+                    <th style="width: 35%;">Объект</th>
+                    <th style="width: 15%;">Начисление</th>
+                    <th style="width: 15%;">Оплата по договору</th>
+{#                    <th style="width: 15%;">Итого</th>#}
+                </tr>
+            </thead>
+            {% endif %}
+            <tbody>
+                {% for item in list_objects %}
+                    {% filter_actionObject_turnover_statement_forunits item.branch_id item.scompany_id item.contract_id item.id select_month select_year accrual as flag %}
+                    {% if flag != 'no' %}
+                        <tr>
+                            <td>{% get_nameclient item.branch_id %}</td>
+                            <td>{{ item.object_name }} ({{ item.object_address }})</td>
+                            {% views_table_turnover_statement_forunits item.branch_id item.scompany_id item.contract_id item.id select_month select_year %}
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+{% comment %}            <tfoot>
+                <tr class="text-center">
+                    <th colspan="3">Итого</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </tfoot>{% endcomment %}
+        </table>
+    </div>
+{% endblock %}

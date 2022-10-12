@@ -1,0 +1,49 @@
+{% load mptt_tags %}
+
+<div class="navbar-default sidebar" role="navigation">
+    <div class="sidebar-nav navbar-collapse">
+        <ul class="nav" id="side-menu">
+            <li class="sidebar-search">
+                <input type="search" id="q" class="form-control" placeholder="Поиск...">
+            </li>
+            <li>
+                <a href="/"><i class="fa fa-dashboard fa-fw"></i> Панель управления</a>
+            </li>
+            <li>
+                {% if nodes %}
+                    {% recursetree nodes %}
+                        {% if node.is_root_node %}                  <!-- если это корневой узел -->
+                            {% if not node.is_leaf_node %}          <!-- если это не элемент -->
+                                <li class="dropdown">
+                                    <a href="#law_department"><i class="fa {{ node.fa_class }} fa-fw"></i> {{ node.name }} <span class="fa arrow"></span></a>
+                                    <ul class="nav nav-second-level">
+                                        {{ children }}
+                                    </ul>
+                                </li>
+                            {% else %}                              <!-- если это элемент -->
+                                <li>
+                                    <a href="/{{ node.slug }}/">{{ node.name }}</a>
+                                    {{ children }}
+                                </li>
+                            {% endif %}
+                        {% else %}                                  <!-- если это не корневой узел -->
+                            {% if node.is_leaf_node %}              <!-- если это элемент -->
+                                <li>
+                                    <a href="/{{ node.get_root.slug }}/{{ node.slug }}/">{{ node.name }}</a>
+                                    {{ children }}
+                                </li>
+                            {% else %}
+                                <li class="dropdown">
+                                    <a href="#law_department">{{ node.name }} <span class="fa arrow"></span></a>
+                                    <ul class="nav nav-third-level">
+                                        {{ children }}
+                                    </ul>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endrecursetree %}
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+</div>

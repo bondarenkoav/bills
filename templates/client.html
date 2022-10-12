@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load bootstrap4 get_viewdata_client humanize other_tags %}
+
+{% block content_title %}{% get_nameclient branch_data.id %}{% endblock %}
+{% block content_area %}Контрагент{% endblock %}
+{% block content_title_small %}{{ branch_data.Client.TypeClient }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8 col-sm-7 col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="card_dataclient" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="infopanelclient-tab" data-toggle="tab" href="#infopanelclient" role="tab" aria-controls="infopanelclient" aria-selected="true">Информационная панель </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="dogovora-tab" data-toggle="tab" href="#dogovora" role="tab" aria-controls="dogovora" aria-selected="false">Договора</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="akts-tab" data-toggle="tab" href="#akts" role="tab" aria-controls="akts" aria-selected="false">Акты</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="trade-tab" data-toggle="tab" href="#trade" role="tab" aria-controls="trade" aria-selected="false">Склад</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="accounting-tab" data-toggle="tab" href="#accounting" role="tab" aria-controls="accounting" aria-selected="false">Бухгалтерия</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content mt-3" id="TabContentDataClient">
+                        <div class="tab-pane fade show active" id="infopanelclient" role="tabpanel" aria-labelledby="infopanelclient-tab">
+                            {% include 'client_inform_tabpane.html' with branch=branch_data scompany=scompany %}
+                        </div>
+                        <div class="tab-pane fade" id="dogovora" role="tabpanel" aria-labelledby="dogovora-tab">
+                            <!-------------- Договора ------------------- -->
+                            <div class="accordion" id="accordion1">
+                                <!-------------- Договора технической охраны ------------------- -->
+                                {% client_viewdata_contracts branch_data.id list_scompany 'tech_security_contract' %}
+                                {% client_viewdata_contracts branch_data.id list_scompany 'build_service_contract' %}
+                                {% client_viewdata_contracts branch_data.id list_scompany 'maintenance_service_contract' %}
+                                {% client_viewdata_contracts branch_data.id list_scompany 'replace_service_contract' %}
+                            </div>
+                            <!-------------- Договора ------------------- -->
+                        </div>
+                        <div class="tab-pane fade" id="akts" role="tabpanel" aria-labelledby="akts-tab">
+                            <!------------------- Акты ------------------- -->
+                            <div class="accordion" id="accordion2">
+                                {% client_viewdata_acts branch_data.id list_scompany 'build_service_act' %}
+                                {% client_viewdata_acts branch_data.id list_scompany 'maintenance_service_act' %}
+                            </div>
+                            <!------------------ Акты ------------------- -->
+                        </div>
+                        <div class="tab-pane fade" id="trade" role="tabpanel" aria-labelledby="trade-tab">
+                            <!------------ Складские документы ----------- -->
+                            <div class="accordion" id="accordion3">
+                                {% client_viewdata_invoices branch_data list_scompany 'not_assigned' %}
+                                {% client_viewdata_invoices branch_data list_scompany 'tech_security_contract' %}
+                                {% client_viewdata_invoices branch_data list_scompany 'build_service_contract' %}
+                                {% client_viewdata_invoices branch_data list_scompany 'maintenance_service_contract' %}
+                                {% client_viewdata_invoices branch_data list_scompany 'build_service_act' %}
+                                {% client_viewdata_invoices branch_data list_scompany 'maintenance_service_act' %}
+                            </div>
+                            <!------------ Складские документы ----------- -->
+                        </div>
+                        <div class="tab-pane fade" id="accounting" role="tabpanel" aria-labelledby="accounting-tab">
+                            <!------------ Бухгалтерия ----------- -->
+                            <div class="list-group">
+                                {% for scompany in list_scompany %}
+                                    <a href="{% url 'finance_department:payment' branch_data.id scompany.id %}" class="list-group-item list-group-item-action">
+                                        <span>{{ scompany.NameBranch }}</span>
+                                        <span style="margin-left: 20px;">Сальдо: {% saldo_scompany branch_data.id scompany.id as saldo %}<strong>{{ saldo|intcomma }}</strong> руб.</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                            <!------------ Бухгалтерия ----------- -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-5 col-xs-12" style="border-width: 0 0 0 1px; border-style: solid; padding-left: 10px;">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="card_client" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="client_data_form-tab" data-toggle="tab" href="#client_data_form" role="tab" aria-controls="client_data_form" aria-selected="true">Клиент</a>
+                        </li>
+                        {% if branch_data.Client.TypeClient.slug == 'company' %}
+                            <li class="nav-item">
+                                <a class="nav-link" id="branch_data_form-tab" data-toggle="tab" href="#branch_data_form" role="tab" aria-controls="branch_data_form" aria-selected="false">Филиал</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" id="bank_data_form-tab" data-toggle="tab" href="#bank_data_form" role="tab" aria-controls="bank_data_form" aria-selected="false">Банки</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="contacts_data-tab" data-toggle="tab" href="#contacts_data_form" role="tab" aria-controls="contacts_data_form" aria-selected="false">Контакты</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="usernote_data-tab" data-toggle="tab" href="#usernote_data_form" role="tab" aria-controls="usernote_data_form" aria-selected="false">Пользовательская информация</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3" id="TabContentClient">
+                        <div class="tab-pane fade show active" id="client_data_form" role="tabpanel" aria-labelledby="client_data_form-tab">
+                            {% client_viewdata_client branch_data %}
+                        </div>
+                        {% if branch_data.Client.TypeClient.slug == 'company' %}
+                            <div class="tab-pane fade" id="branch_data_form" role="tabpanel" aria-labelledby="branch_data_form-tab">
+                                {% client_viewdata_branch branch_data %}
+                            </div>
+                        {% endif %}
+                        <div class="tab-pane fade" id="bank_data_form" role="tabpanel" aria-labelledby="bank_data_form-tab">
+                            {% client_viewdata_bank branch_data %}
+                        </div>
+                        <div class="tab-pane fade" id="contacts_data_form" role="tabpanel" aria-labelledby="contacts_data_form-tab">
+                            {% client_viewdata_contacts branch_data %}
+                        </div>
+                        <div class="tab-pane fade" id="usernote_data_form" role="tabpanel" aria-labelledby="usernote_data_form-tab">
+                            {% client_viewdata_usernote request branch_data %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <h4>Дополнителная информация</h4>
+            <div>
+                <form action="{% url 'index:card_client' branch_data.id %}" method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form_additional_info layout='inline' %}
+                    {% buttons %}
+                        {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                    {% endbuttons %}
+                </form>
+            </div>
+            <h4>Редактирование данных</h4>
+            <div class="btn-group btn-group-justified">
+                <a href="{% if branch_data.Client.TypeClient.slug == 'company' %}
+                            {% url 'contract_department:client_company_update' branch_data.pk %}
+                         {% elif branch_data.Client.TypeClient.slug == 'businessman' %}
+                            {% url 'contract_department:client_businessman_update' branch_data.pk %}
+                         {% else %}
+                            {% url 'contract_department:client_physicalperson_update' branch_data.pk %}
+                         {% endif %}" class="btn btn-default">Контрагента</a>
+                <a href="{% url 'contract_department:contact_add' branch_data.id %}" class="btn btn-default">Контакты</a>
+            </div>
+            <hr/>
+            <h4>Добавить вид контрагента</h4>
+            {% check_add_typeclient branch_data.id as flag %}
+            {% if flag %}
+                <div class="btn-group btn-group-justified">
+                    {% if branch_data.Client.TypeClient.slug == 'businessman' %}
+{#                        <a href="{% url 'contract_department:addclient_physicalperson_worddata_client' branch_data.Client.NameClient_full branch_data.Client.PassportSerNum branch_data.Client.Alien %}" class="btn btn-default">физлицо</a>#}
+                    {% elif branch_data.Client.TypeClient.slug == 'physical_person' %}
+                        <a href="{% url 'contract_department:addclient_businessman_worddata_client' branch_data.Client.INN %}" class="btn btn-default">ИП</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                Другой тип клиента уже есть в системе. Воспользуйтесь поиском.
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

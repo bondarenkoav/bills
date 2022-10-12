@@ -1,0 +1,16 @@
+{% load other_tags %}
+
+<tr>
+    <td class="text-center">{{ forloop.counter }}</td>
+    <td>{{ item.TechSecurityContract.Branch.Client.INN }}</td>
+    <td>{% get_nameclient item.TechSecurityContract.Branch.id %}</td>
+    <td>
+        {% if item.TechSecurityContract.NumContractBranch %}
+            {{ item.TechSecurityContract.NumContractBranch }}
+        {% else %}
+            {{ item.TechSecurityContract.NumContractInternal }}
+        {% endif %}
+    </td>
+    <td>{{ item.NameObject }}({{ item.AddressObject }})</td>
+    <td></td>
+</tr>

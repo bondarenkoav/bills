@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load bootstrap4 accounting_tags other_tags humanize %}
+
+{% block content_title %}Сальдовая ведомость{% endblock %}
+{% block content_area %}{{ scompany.NameBranch }}{% endblock %}
+{% block content_title_small %}{% get_nameclient branch.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-8">
+            <table class="table table-sm">
+                <thead>
+                    <tr class="text-center">
+                        <td style="width: 15%">Дата</td>
+                        <td style="width: 40%">Документ</td>
+                        <td style="width: 15%">Начислено</td>
+                        <td style="width: 15%">Уплачено</td>
+                        <td style="width: 15%">Итого</td>
+                    </tr>
+                </thead>
+                {% now "Y" as current_year %}
+                {% for i in year_list %}
+                    <tbody>
+                        <tr class="clickable" data-toggle="collapse" data-target="#group-{{ i }}" aria-expanded="false" aria-controls="group-{{ i }}">
+                            <th colspan="2"><i class="fa fa-plus" aria-hidden="true"></i> {{ i }}</th>
+                            <th colspan="2">
+                                {% if current_year|to_int != i %}
+                                    Сальдо на 01.01.{{ i|add:"1" }} <code style="margin-left: 10px;">{% get_beginyearsaldo i branch.id scompany.id as beginyearsaldo %}{{ beginyearsaldo|intcomma }}</code> руб.
+                                {% endif %}
+                            </th>
+                        </tr>
+                    </tbody>
+                    <tbody id="group-{{ i }}" class="{% if current_year|to_int != i %}collapse{% endif %}">
+                        {% for item in list_dates %}
+                            {% if item.date_event|date:"Y"|to_int == i %}
+                                {% view_table_accounting item.branch item.scompany item.date_event %}
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                {% endfor %}
+            </table>
+
+            <div style="padding: 15px 15px;" class="d-print-none">
+                <a class="btn btn-warning" href="{% if branch.id %}{% url 'index:card_client' branch.id %}{% else %}#{% endif %}" role="button">Вернуться к клиенту</a>
+            </div>
+        </div>
+
+        <div class="col-4 d-print-none">
+            <hr/>
+            <div class="row">
+                <div class="col-12">
+                    <dl class="row">
+                        <dt class="col-sm-6 pt-2">Сальдо на {{ date_startsaldo|date:"d.m.Y" }}: </dt>
+                        <dd class="col-sm-6">
+                            <button type="button" class="btn btn-default {% if not perms.accounting.sb_item_edit %}disabled{% endif %}" data-toggle="modal" data-target="#changestartbalance">
+                                {% if perms.accounting.sb_item_view %}
+                                    {% if account_saldo_start %}
+                                        <code> {{ account_saldo_start|floatformat:2 }}</code> руб.
+                                    {% else %}
+                                        <code> 0</code> руб.
+                                    {% endif %}
+                                {% else %}
+                                    нет прав на просмотр
+                                {% endif %}
+                            </button>
+                        </dd>
+                        <dt class="col-sm-6 pt-2">Сальдо на {{ curdate|date:"d.m.Y" }}: </dt>
+                        <dd class="col-sm-6">
+                            {% if perms.accounting.cwp_saldo_view %}
+                                {% if account_saldo_total %}
+                                    <span class="h4 {% if account_saldo_total > 0 %}text-danger{% else %}text-success{% endif %}"> {{ account_saldo_total|floatformat:2 }}</span> руб.
+                                {% else %}
+                                    <code> 0</code> руб.
+                                {% endif %}
+                            {% else %}
+                                нет прав на просмотр
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-12">
+                    <hr/>
+                    <button type="button" class="btn btn-info {% if not perms.accounting.cwp_actsverki_view %}disabled{% endif %}"
+                            data-toggle="modal" data-target="#actreconciliation">Акт сверки
+                    </button>
+                    <button type="button" class="btn btn-info {% if not perms.accounting.cwp_item_add %}disabled{% endif %}"
+                            data-toggle="modal" data-target="#manualcharge">Ручное начисление
+                    </button>
+                </div>
+                <div class="col-12">
+                    <hr/>
+                    <h4 class="modal-title">Внесение оплаты</h4>
+                    <form action="{% url 'finance_department:payment' branch.id scompany.id dct.TypeDocument.id dct.id %}" method="post" class="form">
+                        {% csrf_token %}
+                        {% bootstrap_form form_payment layout='horizontal' %}
+                        {% if perms.accounting.cwp_item_add %}
+                            {% bootstrap_button "Внести" button_type="submit" button_class="btn-primary float-right" %}
+                        {% endif %}
+                        {% bootstrap_form_errors form_payment %}
+                    </form>
+                </div>
+            </div>
+
+            {% if perms.accounting.cwp_actsverki_view %}
+                <div class="modal fade" id="actreconciliation" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form action="{% url 'finance_department:act_reconciliation' branch.id scompany.id %}" method="post">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="myModalLabel">Сформировать акт сверки</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {% csrf_token %}
+                                    {% bootstrap_form form_actreconciliation layout='horizontal' %}
+                                    <div>&nbsp;</div>
+                                </div>
+                                <div class="modal-footer">
+                                    {% buttons %}
+                                        {% bootstrap_button "Сформировать" button_type="submit" button_class="btn-primary" %}
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                                    {% endbuttons %}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if perms.accounting.sb_item_edit %}
+                <div class="modal fade" id="changestartbalance" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form action="{% url 'finance_department:change_startbalance' branch.id scompany.id %}" method="post">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="myModalLabel">Скорректировать начальное сальдо</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {% csrf_token %}
+                                    {% bootstrap_form form_startbalance layout='horizontal' %}
+                                </div>
+                                <div class="modal-footer">
+                                    {% buttons %}
+                                        {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                                    {% endbuttons %}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if perms.accounting.cwp_item_add %}
+                <div class="modal fade" id="manualcharge" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form action="{% url 'finance_department:add_accural' branch.id scompany.id %}" method="post">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="myModalLabel">Ручное начисление</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="alert alert-warning" role="alert">
+                                        Ручное начисление предназначено ИСКЛЮЧИТЕЛЬНО для внесения начислений по объектам с
+                                        дифференцированной суммой абонентской платы. Все начисления по другим объектам
+                                        система производит в АВТОМАТИЧЕСКОМ режиме!
+                                    </div>
+                                    {% csrf_token %}
+                                    {% bootstrap_form form_addaccural layout='horizontal' %}
+                                </div>
+                                <div class="modal-footer">
+                                    {% buttons %}
+                                        {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                                    {% endbuttons %}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+{% endblock %}
+
+

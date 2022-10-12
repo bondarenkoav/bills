@@ -1,0 +1,75 @@
+{% load bootstrap4 %}
+
+<form action="
+    {% if contract_data %}
+        {% url urlstr contract_data.Branch.id contract_data.id %}
+    {% else %}
+        {% url urlstr branch.id %}
+    {% endif %}" method="post">
+
+    {% csrf_token %}
+    <div class="form-group border-bottom">
+        {% bootstrap_field form.ServingCompany layout='horizontal' %}
+    </div>
+    <div class="form-group border-bottom">
+        <div class="row">
+            <div class="col-4" style="padding-top: 5px;">
+                {% bootstrap_label "Номер договора" label_for="NumContractInternal" %}
+            </div>
+            <div class="col-8">
+                <div class="row">
+                    <div class="col-12">
+                        {% bootstrap_field form.NumContractInternal layout='horizontal' %}
+                    </div>
+                    <div class="col-12">
+                        {% bootstrap_field form.NumContractBranch layout='horizontal' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group border-bottom">
+        <div class="row">
+            <div class="col-4" style="padding-top: 5px;">
+                {% bootstrap_label "Даты договора" label_for="DateConclusion" %}
+            </div>
+            <div class="col-8">
+                <div class="row">
+                    <div class="col-12">
+                        {% bootstrap_field form.DateConclusion layout='horizontal' %}
+                    </div>
+                    <div class="col-12">
+                        {% bootstrap_field form.DateTermination layout='horizontal' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group border-bottom">
+        {% bootstrap_field form.TemplateDocuments layout='horizontal' %}
+    </div>
+    <div class="form-group border-bottom">
+        {% bootstrap_field form.AmountLimit layout='horizontal' %}
+    </div>
+    <div class="form-group border-bottom">
+        {% bootstrap_field form.DoNotIncludeInCalculations layout='horizontal' %}
+    </div>
+    <div class="form-group border-bottom">
+        {% bootstrap_field form.Notes layout='horizontal' %}
+    </div>
+    <div class="form-group border-bottom">
+        {% bootstrap_field form.NameOfService layout='horizontal' %}
+    </div>
+
+    {% buttons %}
+        <a class="btn btn-warning" href="{% url 'index:card_client' branch_data.id %}" role="button">Вернуться к клиенту</a>
+        {% if perms.replace_service.contract_item_edit %}
+            {% bootstrap_button "Сохранить договор" button_type="submit" button_class="btn-primary" %}
+        {% endif %}
+        {% if contract_data %}
+{#          <a class="btn btn-primary" href="{% url 'replace_service:print_contract' contract_data.Branch.id contract_data.id %}" role="button">Печать договора</a>#}
+            <a class="btn btn-success" href="{% url 'replace_service:addget_object' contract_data.Branch.id contract_data.id %}" role="button">Добавить объект</a>
+            <a class="btn btn-success" href="{% url 'replace_service:addget_act' contract_data.Branch.id contract_data.id %}" role="button">Добавить акт</a>
+        {% endif %}
+    {% endbuttons %}
+</form>

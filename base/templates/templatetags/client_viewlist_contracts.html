@@ -1,0 +1,26 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" data-target="#{{ type_documents.slug }}">
+                <span class="accordion-heading">
+                    <span class="glyphicon glyphicon-chevron-down"></span>
+                    {{ type_documents.Name }}
+                </span>
+                <span style="margin-left: 20px;" class="text-right">
+                    <a href="/{{ type_documents.app }}/branch/{{ branch_id }}/{{ type_documents.type }}/None/">Добавить</a>
+                </span>
+            </a>
+        </h4>
+    </div>
+    <div id="{{ type_documents.slug }}" class="panel-collapse collapse">
+        <div class="panel-body">
+            <div class="list-group">
+                {% for document in documents %}
+                    <a href="/{{ document.TypeDocument.app }}/branch/{{ document.Branch.id }}/{{ document.TypeDocument.type }}/{{ document.id }}/" class="list-group-item">
+                        {{ document.NumContractInternal }} ( {{ document.NumContractBranch }} ) от {{ document.DateConclusion }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static bootstrap3 scheduletags %}
+
+{% block head_content %}
+    <link rel='stylesheet' type='text/css' href="{% static 'static/css/fullcalendar.min.css' %}" />
+    <script type='text/javascript' src="{% static 'static/js/moment.js' %}"></script>
+    <script type='text/javascript' src="{% static 'static/js/fullcalendar.min.js' %}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip({
+                placement : 'top'
+            });
+            $( '#q' ).keyup( function() {
+                q = $( '#q' ).val();
+                if (q!=''){
+                    $( '#results').load( '/search/?q=' + q );
+                }
+            });
+        });
+        var block = document.getElementById("messages");
+        block.scrollTop = block.scrollHeight;
+    </script>
+{% endblock %}
+
+{% block title %}Главная панель{% endblock %}
+{% block body_title %}Главная панель{% endblock %}
+
+{% block user_menu %}{{ login }}{% endblock %}
+
+{% block content %}
+    <div class="col-lg-12 col-md-12">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-envelope-o fa-4x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ new_messages }}</div>
+                                <div>Новых сообщений</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#">
+                        <div class="panel-footer">
+                            <span class="pull-left">Подробнее</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-green">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-tasks fa-4x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ new_tasks }}</div>
+                                <div>Новых задач</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/tasks/">
+                        <div class="panel-footer">
+                            <span class="pull-left">Подробнее</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-yellow">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-bell fa-4x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ new_notifications }}</div>
+                                <div>Напоминания</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/notifications/">
+                        <div class="panel-footer">
+                            <span class="pull-left">Подробнее</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-red">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-warning fa-4x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ new_errors }}</div>
+                                <div>Ошибок</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#">
+                        <div class="panel-footer">
+                            <span class="pull-left">Подробнее</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12">
+        <div class="row">
+            <div class="col-lg-8 col-md-12">
+                <div id="results"></div>
+{#                <div class="panel panel-primary">#}
+{#                    <div class="panel-heading">#}
+{#                        <i class="fa fa-bar-chart-o fa-fw"></i> Динамика#}
+{#                    </div>#}
+{#                    <!-- /.panel-heading -->#}
+{#                    <div class="panel-body">#}
+{#                        <div id="results"></div>#}
+{#                    </div>#}
+{#                    <!-- /.panel-body -->#}
+{#                </div>#}
+            </div>
+            <!--
+            <div class="col-lg-4 col-md-12">
+                <div id="calendar" style="margin-bottom: 20px;"></div>
+                <div class="chat-panel panel panel-primary" style="height: auto">
+                    <div class="panel-heading">
+                        <i class="fa fa-comments fa-fw"></i> Публичный чат
+                    </div>
+                    {% include 'chat.html' with user=user %}
+                </div>
+            </div>
+            -->
+        </div>
+    </div>
+    <script type='text/javascript'>
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                events: '/schedule/api/occurrences?calendar_slug=example',
+                firstDay: 1,
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+                monthNamesShort: ['Янв.','Фев.','Март','Апр.','Май','Июнь','Июль','Авг.','Сент.','Окт.','Ноя.','Дек.'],
+                dayNames: ["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"],
+                dayNamesShort: ["ВС","ПН","ВТ","СР","ЧТ","ПТ","СБ"],
+                buttonText: {
+                    today: "Сегодня",
+                    month: "Месяц",
+                    week: "Неделя",
+                    day: "День"
+                }
+            })
+        });
+    </script>
+{% endblock %}

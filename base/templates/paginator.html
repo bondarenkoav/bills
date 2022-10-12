@@ -1,0 +1,23 @@
+<ul class="pagination">
+    {% if massive_pages.has_previous == True %}
+        <li><a href="{% url urlstr massive_pages.previous_page_number %}">&laquo;</a></li>
+        <li><a href="{% url urlstr 1 %}">1</a></li>
+        <li class="disabled"><a href="#">...</a></li>
+    {% else %}
+        <li class="disabled"><a href="#">&laquo;</a></li>
+    {% endif %}
+    {% for page in massive_pages.paginator.page_range %}
+        {% if page == massive_pages.number %}
+            <li class="active">
+                <a>{{ massive_pages.number }}<span class="sr-only">(текущая)</span></a>
+            </li>
+        {% endif %}
+    {% endfor %}
+    {% if massive_pages.has_next == True %}
+        <li class="disabled"><a href="#">...</a></li>
+        <li><a href="{% url urlstr massive_pages.paginator.num_pages %}">{{ massive_pages.paginator.num_pages }}</a></li>
+        <li><a href="{% url urlstr massive_pages.next_page_number %}">&raquo;</a></li>
+    {% else %}
+        <li class="disabled"><a href="#">&raquo;</a></li>
+    {% endif %}
+</ul>

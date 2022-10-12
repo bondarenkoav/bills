@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Биллинг3.0{% endblock %}
+
+{% block body_title %}
+    Список задач
+    <span style="margin-left: 20px;"><a href="/notifications/item/None/"><abbr title="attribute">Добавить задачу</abbr></a></span>
+{% endblock %}
+
+{% block content %}
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+
+            <thead>
+                <tr>
+                    <td style="width: 30%;">Тема</td>
+                    <td style="width: 50%;">Контрагент / Договор / Объект</td>
+                    <td style="width: 10%;">Срок выполнения</td>
+                    <td style="width: 10%;">Дата создания</td>
+                </tr>
+            </thead>
+
+            {% for item in notifications %}
+                <tbody>
+                    <tr id="obj_{{ item.id }}" onclick="location.href = '/notifications/item/{{ item.id }}/';">
+                        <td>{{ item.section }}</td>
+                        <td>
+                            {% if item.read %}
+                                {{ item.note }}
+                            {% else %}
+                                <strong>{{ item.note }}</strong>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.limitation }}</td>
+                        <td>{{ item.DateTime_add }}</td>
+                    </tr>
+                </tbody>
+            {% endfor %}
+
+        </table>
+    </div>
+
+{% endblock %}
+
+{#{% block pagination %}#}
+{##}
+{#    <ul class="pagination pagination">#}
+{#        {% if post.has_previous %}#}
+{#            <li><a href="/reference_books/post/page/{{ post.previous_page_number }}/">&laquo;</a></li>#}
+{#        {% else %}#}
+{#            <li class="disabled"><a href="">&laquo;</a></li>#}
+{#        {% endif %}#}
+{##}
+{#        {% for page in post.paginator.page_range %}#}
+{#            {% if page == post.value %}#}
+{#                <li class="active"><a href="/reference_books/post/page/{{ page }}/">{{ page }}</a></li>#}
+{#            {% else %}#}
+{#                <li><a href="/reference_books/post/page/{{ page }}/">{{ page }}</a></li>#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
+{##}
+{#        {% if post.has_next %}#}
+{#            <li><a href="/reference_books/post/page/{{ post.next_page_number }}/">&raquo;</a></li>#}
+{#        {% else %}#}
+{#            <li class="disabled"><a href="">&raquo;</a></li>#}
+{#        {% endif %}#}
+{#    </ul>#}
+{##}
+{#{% endblock %}#}

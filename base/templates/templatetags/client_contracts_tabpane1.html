@@ -1,0 +1,24 @@
+<div class="card">
+    <div class="card-header" id="#heading_{{ type_documents.slug }}">
+        <h4 class="mb-0">
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#contract_{{ type_documents.slug }}" aria-expanded="true" aria-controls="collapseOne">
+                <span class="glyphicon glyphicon-chevron-down"></span>
+                {{ type_documents.Name }}
+                <span style="margin-left: 20px;">
+                    <a href="{% url addget_url branch %}"><i class="fa fa-plus-square fa-lg" aria-hidden="true">  Добавить</i></a>
+                </span>
+            </button>
+        </h4>
+    </div>
+    <div id="contract_{{ type_documents.slug }}" class="collapse" aria-labelledby="heading_{{ type_documents.slug }}" data-parent="#accordionExample">
+        <div class="card-body">
+            <div class="list-group">
+                {% for item in documents %}
+                    <a href="{% url addget_url branch item.id %}" class="list-group-item">
+                        {{ item.NumContractInternal }} ( {{ item.NumContractBranch }} ) от {{ item.DateConclusion }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

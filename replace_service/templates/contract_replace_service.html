@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load bootstrap4 other_tags humanize %}
+
+{% block content_title %}
+    {% if contract_data %}№ {{ contract_data.NumContractInternal }} от {{ contract_data.DateConclusion }}{% else %}Новый{% endif %}
+{% endblock %}
+{% block content_area %}Договор по заменам{% endblock %}
+{% block content_title_small %}на {% get_nameclient branch_data.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-5 col-xs-12">
+            {% include "templatetags/contract_form_replace_service.html" with urlstr='replace_service:addget_contract' form=form branch=branch_data contract=contract_data perms=perms %}
+
+            {% if contract_data %}
+                <div class="alert alert-secondary" role="alert">
+                    <span>Освоено: {% if SumPriceAllActs.price %}{{ SumPriceAllActs.price|intcomma:2 }}{% else %}0,00{% endif %} рублей {% if AmountLimit > 0 %}из {{ AmountLimit|intcomma:2 }} рублей{% endif %}</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-sm-7 col-xs-12">
+            {% if contract_data %}
+                <ul class="nav nav-tabs" id="card_actsobjects" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="acts-tab" data-toggle="tab" href="#acts" role="tab" aria-controls="acts" aria-selected="true">Акты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="objects-tab" data-toggle="tab" href="#objects" role="tab" aria-controls="objects" aria-selected="false">Объекты</a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3" id="TabActsAndObjects">
+                    <div class="tab-pane fade show active" id="acts" role="tabpanel" aria-labelledby="acts-tab">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="10%">Тип</th>
+                                    <th width="35%">Объект</th>
+                                    <th width="8%">Выполнено</th>
+                                    <th width="12%">Стоимость</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for act in acts %}
+                                <tr class="{{ object.NameClassBootstrap }}" id="obj_{{ object.id }}" onclick="location.href = '{% if perms.replace_service.object_item_view %}{% url 'replace_service:addget_object' contract_data.Branch.id contract_data.id object.id %}{% else %}#{% endif %}';">
+                                    <td>{{ forloop.counter|add:page_add }}</td>
+                                    <td>{{ act.TypeWork }}</td>
+                                    <td>{{ act.ReplaceServiceObject }}</td>
+                                    <td>{{ act.DateWork|date:"d.m.Y" }}</td>
+                                    <td>{{ act.Price }}</td>
+                                    <td>
+                                        {% for cowork in act.CoWorkers.all %}
+                                            {{ cowork }}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="objects" role="tabpanel" aria-labelledby="objects-tab">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="10%">Тип</th>
+                                    <th width="15%">Наименование</th>
+                                    <th width="35%">Адрес объекта</th>
+                                    <th width="12%">Активен</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for object in objects %}
+                                <tr class="{{ object.NameClassBootstrap }}" id="obj_{{ object.id }}" onclick="location.href = '{% if perms.replace_service.object_item_view %}{% url 'replace_service:addget_object' contract_data.Branch.id contract_data.id object.id %}{% else %}#{% endif %}';">
+                                    <td>{{ forloop.counter|add:page_add }}</td>
+                                    <td>{{ object.TypeObject.ShortName }}</td>
+                                    <td>{{ object.NameObject }}</td>
+                                    <td>{{ object.AddressObject }}</td>
+                                    <td>{{ object.ActiveObject|yesno:"да,нет" }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% include 'templatetags/pagination.html' with page_obj=objects %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+

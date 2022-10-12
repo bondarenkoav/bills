@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load bootstrap4 other_tags smssend_tags %}
+
+{% block include_header %}
+    <script>
+        function sendDebtSMS(){
+            $(document).ready(function(){
+                var count_sms = $("#count_sms").val();
+                for (var i = 0; i <= count_sms; i++) {
+                    var phone = $("#phone_" + i).val();
+                    var summ = $("#summdebt_" + i).val();
+                    alert(phone + '(' + summ + ')');
+                    $.ajax({
+                        url: '/finance_department/sendsms_debtors/run/',
+                        datatype: "json",
+                        type: 'post',
+                        //contentType: 'application/json',
+                        data: {"phone": phone, "summ": summ},
+                        success: function (data) {
+                            if (data.is_taken) {
+                                alert(data.error_message);
+                            }
+                        }
+                    });
+                }
+                //return false;
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block content_title %}Рассылка СМС-уведомлений должникам{% endblock %}
+{% block content_area %}Финансовый отдел{% endblock %}
+{% block content_title_small %}Дополнительные функции{% endblock %}
+
+{% block content %}
+    <div class="d-none d-sm-block d-print-none">
+        <form action="{% url 'finance_department:sendsms_debtors' %}" method="post" class="form-inline">
+            {% csrf_token %}
+            {% bootstrap_form form layout='inline' %}
+            {% bootstrap_button "Показать" button_type="submit" button_class="btn-primary" %}
+        </form>
+    </div>
+    <div class="processData"></div>
+    <div class="table-responsive">
+        <form id="form" action="/" method="post">
+            <table class="table">
+                <thead>
+                    <tr class="text-center">
+                        <th width="5%">#</th>
+                        <th width="10%">Отправлять</th>
+                        <th width="35%">Клиент</th>
+                        <th width="10%">Номер</th>
+                        <th width="10%">Долг</th>
+                        <th width="30%">Результат</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-center">1</td>
+                        <td class="text-center"><input type="checkbox" name="tag[]" value="1" checked></td>
+                        <td>Аряпова Галина <input type="hidden" name="client_1" value="319807"></td>
+                        <td class="text-center">9128434125<input type="hidden" id="phone_1" value="9128434125"></td>
+                        <td class="text-center">2400,00<input type="hidden" id="summdebt_1" value="2400"></td>
+                        <td><div name="result_1"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">2</td>
+                        <td class="text-center"><input type="checkbox" name="tag[]" value="2" checked></td>
+                        <td>Коротков Один <input type="hidden" name="client_2" value="319836"></td>
+                        <td class="text-center">9058454447<input type="hidden" id="phone_2" value="9058454447"></td>
+                        <td class="text-center">1350,00<input type="hidden" id="summdebt_2" value="1350"></td>
+                        <td><div name="result_2"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">3</td>
+                        <td class="text-center"><input type="checkbox" name="tag[]" value="3" checked></td>
+                        <td>Коротков Два <input type="hidden" name="client_3" value="319837"></td>
+                        <td class="text-center">9228464680<input type="hidden" id="phone_3" value="9228464680"></td>
+                        <td class="text-center">1800,00<input type="hidden" id="summdebt_3" value="1800"></td>
+                        <td><div name="result_3"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">4</td>
+                        <td class="text-center"><input type="checkbox" name="tag[]" value="4" checked></td>
+                        <td>Коротков Три <input type="hidden" name="client_4" value="319840"></td>
+                        <td class="text-center">9123555701<input type="hidden" id="phone_4" value="9123555701"></td>
+                        <td class="text-center">12774,00<input type="hidden" id="summdebt_4" value="12774"></td>
+                        <td><div name="result_4"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">5</td>
+                        <td class="text-center"><input type="checkbox" name="tag[]" value="5" checked></td>
+                        <td>Бондаренко Андрей <input type="hidden" name="client_5" value="319855"></td>
+                        <td class="text-center">9033686263<input type="hidden" id="phone_5" value="9033686263"></td>
+                        <td class="text-center">1350,00<input type="hidden" id="summdebt_5" value="1350"></td>
+                        <td><div name="result_5"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">6</td>
+                        <td class="text-center"><input type="checkbox" name="tag[]" value="6" checked></td>
+                        <td>Бондаренко Ольга <input type="hidden" name="client_6" value="319855"></td>
+                        <td class="text-center">9873405395<input type="hidden" id="phone_6" value="9873405395"></td>
+                        <td class="text-center">1350,00<input type="hidden" id="summdebt_6" value="1350"></td>
+                        <td><div name="result_6"></div></td>
+                    </tr>
+        {% comment %}                    {% for sms in list %}
+                                <tr>
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td class="text-center"><input type="checkbox" name="tag[]" value="{{ forloop.counter }}" checked></td>
+                                    <td>{% get_nameclient sms.id %}
+                                        <input type="hidden" name="client_{{ forloop.counter }}" value="{{ sms.id }}"></td>
+                                    <td class="text-center">{% get_phone_clean sms.phone_sms %}<input type="hidden" id="phone_{{ forloop.counter }}" value="{% get_phone_clean sms.phone_sms %}"></td>
+                                    <td class="text-center">{{ sms.saldo }}<input type="hidden" id="summdebt_{{ forloop.counter }}" value="{{ sms.summ_debt }}"></td>
+                                    <td></td>
+                                </tr>
+                            {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">Итого: {{ list.count }} <input type="hidden" name="count_debt" id="count_sms" value="{{ list.count }}"> адресата(ов)</td>
+                        <td colspan="3"><button type="submit" onclick="sendDebtSMS()">Отправить</button></td>
+                    </tr>
+                </tfoot>{% endcomment %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">Итого: 6<input type="hidden" name="count_debt" id="count_sms" value="6"> адресата(ов)</td>
+                        <td colspan="3">
+                            <button class="btn btn-info" type="button" onclick="sendDebtSMS()">Отправить</button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+    </div>
+{% endblock %}

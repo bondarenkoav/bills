@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 other_tags %}
+
+{% block include_header %}
+    <link href="{% static "css/suggestions-15.12.css" %}" rel="stylesheet" type="text/css"/>
+{% endblock %}
+
+{% block include_footer %}
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+	<script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+{% endblock %}
+
+{% block content_title %}
+    {% if object_data != None %}
+        № {{ object_data.id }}
+    {% else %}
+        Новый
+    {% endif %}
+{% endblock %}
+{% block content_area %}
+    Объект договора ТО {{ contract_data.NumContractInternal }} от {{ contract_data.DateConclusion }}
+{% endblock %}
+{% block content_title_small %}на {% get_nameclient contract_data.Branch.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-5 col-xs-12">
+
+            <ul class="nav nav-tabs" id="card_dataobject" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="base-tab" data-toggle="tab" href="#base" role="tab" aria-controls="base" aria-selected="true">Основное</a>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3" id="TabContentDataClient">
+                <div class="tab-pane fade show active" id="base" role="tabpanel" aria-labelledby="base-tab">
+                    <form action="{% if object_data %}{% url 'maintenance_service:addget_object' object_data.MaintenanceServiceContract.Branch.id object_data.MaintenanceServiceContract.id object_data.id %}{% else %}{% url 'maintenance_service:addget_object' contract_data.Branch.id contract_data.id %}{% endif %}" method="post">
+                        {% csrf_token %}
+                        {% bootstrap_field form.TypeObject layout='horizontal' %}
+                        {% bootstrap_field form.NameObject layout='horizontal' %}
+                        {% bootstrap_field form.CityObject layout='horizontal' %}
+                        {% bootstrap_field form.AddressObject layout='horizontal' %}
+                        {% bootstrap_field form.PaymentMethods layout='horizontal' %}
+                        {% bootstrap_field form.Price layout='horizontal' %}
+                        <div class="form-group row">
+                            <div class="col-4" style="padding-top: 5px;">
+                                {% bootstrap_label "Дата начала/окончания" label_for="DateStart" %}
+                            </div>
+                            <div class="col-4">
+                                {% bootstrap_field form.DateStart layout='inline' %}
+                            </div>
+                            <div class="col-4">
+                                {% bootstrap_field form.DateEnd layout='inline' %}
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-4" style="padding-top: 5px;">
+                                {% bootstrap_label "Вид обслуж. системы ТСО" label_for="TypeEquipInstalled" %}
+                            </div>
+                            <div class="col-8">
+                                {% for choice in form.TypeEquipInstalled %}
+                                    <div class="form-check-inline" {% if forloop.counter0 == 0 %}style="margin-left: 0px;"{% endif %}>
+                                        {% bootstrap_label choice %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% buttons %}
+                            <a class="btn btn-warning" href="{% url 'maintenance_service:addget_contract' contract_data.Branch.id contract_data.id %}" role="button">Вернуться к договору</a>
+                            {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#openform_map">Координаты</button>
+                        {% endbuttons %}
+                    </form>
+                    <!-- Вывод карты для отметки месторасположения -->
+                    {% include 'open_map.html' %}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-7 col-xs-12">
+            <!-- Вывод истории объекта -->
+            <div class="col-xs-12">
+                <h4>История событий объекта</h4>
+                <table class="table table-striped">
+                    <thead>
+                        <tr class="text-center">
+                            <th style="width: 5%;">#</th>
+                            <th style="width: 15%;">Дата события</th>
+                            <th style="width: 30%;">Событие</th>
+                            <th style="width: 20%;">Предыдущая запись</th>
+                            <th style="width: 20%;">Дата/время записи</th>
+                            <th style="width: 10%;">Пользователь</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                            <tr class="text-center">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{% if event.event_date %}{{ event.event_date|date:"d.m.Y" }}{% endif %}</td>
+                                <td><small>{{ event.event_code }}</small></td>
+                                <td>{{ event.old_value }}</td>
+                                <td>{{ event.add_date }}</td>
+                                <td>{{ event.user }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

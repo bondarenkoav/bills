@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}{% if data %}{{ data.Name }}{% else %}новый{% endif %}{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <form action="{% if data %}{% url 'reference_books:addget_scompany' data.id %}{% else %}{% url 'reference_books:addget_scompany' %}{% endif %}" method="post" class="form">
+                {% csrf_token %}
+                {% bootstrap_form form layout='horizontal' %}
+                {% buttons %}
+                    <a class="btn btn-warning" href="{% url 'reference_books:getlist_scompany' %}" role="button">Вернуться к списку</a>
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                {% endbuttons %}
+            </form>
+        </div>
+    </div>
+{% endblock %}
+        <!-- Модальное окно -->
+{% comment %}        <div class="modal fade" id="sub_contract" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Обновление данных организации</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label for="party">Для обновления общих данных введите ИНН:</label>
+                        <input id="party" class="form-control" name="party" type="text" placeholder="Введите ИНН или ОГРН организации"/>
+                        <label for="bik_bank">Для обновления банковских реквизитов - введите БИК банка:</label>
+                        <input id="" class="form-control" name="party" type="text" placeholder="Введите ИНН или ОГРН организации"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>{% endcomment %}

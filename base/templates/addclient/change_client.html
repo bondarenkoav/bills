@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 other_tags %}
+
+{% block include_header %}
+    <link href="{% static "css/suggestions-15.12.css" %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block include_footer %}
+    <script src="{% static "js/jquery.mask.js" %}" type="text/javascript" ></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.phone_mobile').mask('(000) 000-0000', {placeholder: "(___) ___-____"});
+            $('.phone_stat').mask('(0000) 00-0000', {placeholder: "(____) __-____"});
+            $('.bank_bik').mask('099999999', {placeholder: "0________"});
+            $('.bank_rs').mask('99999999999999999999', {placeholder: "20 знаков"});
+            $('.passportsernum').mask('9999 999999', {placeholder: "____ ______"});
+        });
+    </script>
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+	<script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+{% endblock %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block body_title %}
+    Изменение данных контрагента ({{ branch_data.Client.TypeClient.DescTypeClient }}) - {% get_nameclient branch_data.id %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% bootstrap_messages %}
+        <form action="{{ url_ }}" method="post" class="form">
+            {% csrf_token %}
+            <div class="row mb-2 p-2 border-bottom">
+                {% if branch_data.Client.TypeClient.slug == 'company' %}
+                    <div class="col-2">Филиал</div>
+                    <div class="col-10">{% bootstrap_field form_branch.NameBranch layout='inline' %}</div>
+                {% else %}
+                    <div class="col-2">ФИО</div>
+                    <div class="col-6">{% bootstrap_field form_client.NameClient_full layout='inline' %}</div>
+                    <div class="col-4">{% if form_client.Alien %}{% bootstrap_field form_client.Alien layout='inline' %}{% endif %}</div>
+                {% endif %}
+            </div>
+            {% if branch_data.Client.TypeClient.slug == 'physical_person' or branch_data.Client.TypeClient.slug == 'businessman' %}
+                <div class="row mb-2 p-2 border-bottom">
+                    <div class="col-2">Паспорт</div>
+                    <div class="col-2">{% bootstrap_field form_client.PassportSerNum layout='inline' %}</div>
+                    <div class="col-2">{% bootstrap_field form_client.DatePassport layout='inline' %}</div>
+                    <div class="col-6">{% bootstrap_field form_client.IssuedByPassport layout='inline' %}</div>
+                </div>
+            {% endif %}
+            {% if branch_data.Client.TypeClient.slug == 'company' %}
+                <div class="row mb-2 p-2 border-bottom">
+                    <div class="col-2">Руководитель</div>
+                    <div class="col-2">{% bootstrap_field form_branch.Management_post layout='inline' %}</div>
+                    <div class="col-3">{% bootstrap_field form_branch.Management_name layout='inline' %}</div>
+                    <div class="col-5">{% bootstrap_field form_branch.Management_data layout='inline' %}</div>
+                </div>
+            {% endif %}
+            <div class="row mb-2 p-2 border-bottom">
+                <div class="col-2">Адреса</div>
+                <div class="col-10">
+                    <div class="row">
+                        <div class="col-2">
+                            {% if branch_data.Client.TypeClient.slug == 'company' %}Юридический{% else %}Регистрации{% endif %}
+                        </div>
+                        <div class="col-10">
+                            {% if branch_data.Client.TypeClient.slug == 'company' %}
+                                {% bootstrap_field form_branch.Address_reg layout='inline' form_group_class='form-group m-0' %}
+                            {% else %}
+                                {% bootstrap_field form_client.Address_reg layout='inline' form_group_class='form-group m-0' %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row p-0">
+                        {% if branch_data.Client.TypeClient.slug == 'company' or branch_data.Client.TypeClient.slug == 'businessman' %}
+                            <div class="col-2">Почтовый</div>
+                            <div class="col-10">{% bootstrap_field form_branch.Address_post layout='inline' form_group_class='form-group m-0' %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="row p-0">
+                        <div class="col-2">Электронный</div>
+                        <div class="col-10">{% bootstrap_field form_branch.Address_email layout='inline' %}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2 p-2 border-bottom">
+                <div class="col-2">Реквизиты</div>
+                <div class="col-10">
+                    <div class="row">
+                        <div class="col-1 float-right">ИНН</div>
+                        <div class="col-3">{% bootstrap_field form_client.INN layout='inline' %}</div>
+                        {% if branch_data.Client.TypeClient.slug == 'company' %}
+                            <div class="col-1 float-right">КПП</div>
+                            <div class="col-3">{% bootstrap_field form_branch.KPP layout='inline' %}</div>
+                        {% endif %}
+                        {% if branch_data.Client.TypeClient.slug == 'company' or branch_data.Client.TypeClient.slug == 'businessman' %}
+                            <div class="col-1 float-right">ОГРН</div>
+                            <div class="col-3">{% bootstrap_field form_client.OGRN layout='inline' %}</div>
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-1 float-right">БИК</div>
+                        <div class="col-2">{% bootstrap_field form_branch.Bank_BIK layout='inline' %}</div>
+                        <div class="col-1 float-right">р/с</div>
+                        <div class="col-3">{% bootstrap_field form_branch.Bank_RaschetSchet layout='inline' %}</div>
+                        <div class="col-5">{% bootstrap_field form_branch.Bank_Details layout='inline' %}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2 p-2 border-bottom">
+                <div class="col-2">Телефоны</div>
+                <div class="col-10">
+                    <div class="row">
+                        <div class="col-2 float-right">Стационарный</div>
+                        <div class="col-4">{% bootstrap_field form_branch.Phone_city layout='inline' %}</div>
+                        <div class="col-2 float-right">Мобильный</div>
+                        <div class="col-4">{% bootstrap_field form_branch.Phone_mobile layout='inline' %}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 float-right">СМС</div>
+                        <div class="col-4">{% bootstrap_field form_branch.Phone_SMS layout='inline' %}</div>
+                        {% if branch_data.Client.TypeClient.slug == 'company' %}
+                            <div class="col-2 float-right">Факс</div>
+                            <div class="col-4">{% bootstrap_field form_branch.Phone_fax layout='inline' %}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row p-2">
+                <div class="col-2">Прочее</div>
+                <div class="col-4">{% bootstrap_field form_branch.EDO layout='inline' %}</div>
+                <div class="col-4">{% bootstrap_field form_branch.Accruals_roundoff layout='inline' %}</div>
+                <div class="col-2"><button type="submit" class="btn btn-primary float-right">Сохранить</button></div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block nav_footer_left %}
+    <a href="{% url 'index:card_client' branch_data.id %}" class="list-group-item">&laquo; Уйти из режима редактирования</a>
+{% endblock %}

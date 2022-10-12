@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load accounting_tags bootstrap4 %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <form class="form-horizontal" method="POST" action="{% url 'finance_department:view_payment' form.instance.branch.id form.instance.scompany.id form.instance.id %}">
+        {% csrf_token %}
+        {% bootstrap_form_errors form layout='inline' %}'
+
+        <div class="row">
+            {% if form.instance.dct %}
+                <div class="col-3">
+                    {{ form.instance.dct|get_document }}
+                </div>
+            {% endif %}
+            <div class="col-5">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">{{ form.instance.payment_methods|title }}</span>
+                    </div>
+                    {{ form.summ }}
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">руб.</span>
+                    </div>
+                    <div class="input-group-append" id="button-addon2">
+                        <a class="btn btn-danger" href="{% url 'finance_department:delete_payment' form.instance.id %}">
+                            Удалить
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="padding: 10px;">
+            <div class="col-3"><a href="{% url 'finance_department:payment' form.instance.branch.id form.instance.scompany.id %}" class="list-group-item">&laquo; Вернуться к сальдовой ведомости</a></div>
+            <div class="col-2">{% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}</div>
+        </div>
+    </form>
+{% endblock %}

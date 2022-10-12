@@ -1,0 +1,22 @@
+{% load other_tags %}
+
+{% if saldo %}
+    <tr>
+        <td>{% comment %}{{ forloop.counter }}{% endcomment %}</td>
+        <td><input type="checkbox" name="send_id{% comment %}{{ forloop.counter }}{% endcomment %}" checked></td>
+        <td>{% get_nameclient branch.id %}
+            <small>
+                {% if branch.Client.TypeClient.slug == 'company' %}
+                    ИНН/КПП: {{ branch.Client.INN }}/{{ branch.KPP }}
+                {% elif branch.Client.TypeClient.slug == 'businessman' %}
+                    ИНН: {{ branch.Client.INN }} Паспорт: {{ branch.Client.PassportSerNum }} выдан {{ branch.Client.DatePassport }} {{ branch.Client.IssuedByPassport }}
+                {% else %}
+                    Паспорт: {{ branch.Client.PassportSerNum }} выдан {{ branch.Client.DatePassport }} {{ branch.Client.IssuedByPassport }}
+                {% endif %}
+            </small>
+        </td>
+        <td>{{ branch.Phone_SMS }}</td>
+        <td>{{ saldo.summ }} руб.</td>
+        <td><span id="result_{% comment %}{{ forloop.counter }}{% endcomment %}"></span></td>
+    </tr>
+{% endif %}

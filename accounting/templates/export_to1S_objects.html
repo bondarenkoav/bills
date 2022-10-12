@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load bootstrap4 accounting_tags other_tags %}
+
+{% block content_title %}Список объектов попавших в выгрузку{% endblock %}
+{% block content_area %}Финансовый отдел{% endblock %}
+{% block content_title_small %}Интеграция с 1С{% endblock %}
+
+{% block content %}
+    <div class="d-none d-sm-block d-print-none">
+        <form action="{% url 'finance_department:export_to1S_objects_action' %}" method="post" class="form-inline">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-4">
+                    {% bootstrap_field form.scompany layout='horizontal' %}
+                </div>
+                <div class="col-2">
+                    {% bootstrap_field form.edo layout='horizontal' %}
+                </div>
+                <div class="col-2">
+                    {% bootstrap_field form.paymentAfter layout='horizontal' %}
+                </div>
+                <div class="col-3">
+                    {% buttons %}
+                        {% bootstrap_button "Показать" button_type="submit" button_class="btn-primary" %}
+                        <a class="btn btn-{% if objects_error %}danger{% elif scompany_id == None %}secondary{% else %}primary{% endif %} {% if scompany_id == None %}disabled{% endif %}" href="{% if scompany_id %}{% url 'finance_department:export_to1S_objects_to_xml' scompany_id edo paymentAfter %}{% else %}#{% endif %}" role="button">Выгрузить</a>
+                    {% endbuttons %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div style="margin-top: 20px;">
+        {% if objects_noerror %}
+            {% if objects_error  %}
+                <div class="alert alert-warning" role="alert">Перед выгрузкой ознакомтесь со списком объектов которые не попадут в выгрузку</div>
+                <div class="alert alert-danger" role="alert">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="text-center">
+                                    <th width="5">№п/п</th>
+                                    <th width="25">Собственник</th>
+                                    <th width="10">№ Договора</th>
+                                    <th width="35">Объект</th>
+                                    <th width="25">Ошибка</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in objects_error %}
+                                    <tr>
+                                        <td class="text-center">{{ forloop.counter }}</td>
+                                        <td>
+                                            {% get_nameclient item.branch_id %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if item.numcontract_external %}
+                                                {{ item.numcontract_external }}
+                                            {% else %}
+                                                {{ item.numcontract_internal }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ item.name_object }} ({{ item.address_object }})
+                                        </td>
+                                        <td class="text-center">
+                                            {% if item.inn == '' %}
+                                                Отсутствует ИНН
+                                            {% else %}
+                                                ИНН должен быть 10 или 12 знаков
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr class="text-center">
+                        <th colspan="7">Объекты попадающие в выгрузку</th>
+                    </tr>
+                    <tr class="text-center">
+                        <th width="5">№п/п</th>
+                        <th width="10">ИНН</th>
+	                    <th width="25">Собственник</th>
+                        <th width="10">№ Договора</th>
+            	        <th width="35">Объект</th>
+                        <th width="10">Абонплата, руб.</th>
+                        <th width="5">ЭДО</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in objects_noerror %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td class="text-right">{{ item.inn }}</td>
+                            <td>
+                                {% get_nameclient item.branch_id %}
+                            </td>
+                            <td class="text-center">
+                                {% if item.numcontract_external %}
+                                    {{ item.numcontract_external }}
+                                {% else %}
+                                    {{ item.numcontract_internal }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ item.name_object }} ({{ item.address_object }})
+                            </td>
+                            <td class="text-center">
+                                {{ item.price }}
+                            </td>
+                            <td class="text-center">{{ item.edo|yesno:"ДА,НЕТ" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

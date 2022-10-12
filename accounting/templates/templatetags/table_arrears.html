@@ -1,0 +1,19 @@
+{% load mathfilters humanize other_tags %}
+
+{% if summ_accural %}
+    <tr>
+        <td class="text-left">
+            {% get_nameclient branch.id %}<br/>
+            {% if objects %}
+                <small>Объекты: {{ objects|truncatechars:50 }}</small>
+            {% endif %}
+        </td>
+        <td class="text-center">{{ summ_accural }}</td>
+        <td class="text-center">
+            {% if last_payment %}
+                {{ last_payment.date_event|date:"d.m.Y" }} <sup>{{ last_payment.summ|abs|intcomma }}</sup>
+            {% endif %}
+        </td>
+        <td class="text-center">{{ total_summ|intcomma }}</td>
+    </tr>
+{% endif %}

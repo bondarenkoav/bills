@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 other_tags %}
+
+{% block include_header %}
+    <link href="{% static "css/suggestions-15.12.css" %}" rel="stylesheet" type="text/css"/>
+{% endblock %}
+
+{% block include_footer %}
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+	<script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+{% endblock %}
+
+{% block content_title %}
+    {% if act_data %}№ {{ act_data.id }} от {{ contract_data.DateWork }}{% else %}Новый{% endif %}
+{% endblock %}
+{% block content_area %}Акт монтажа{% endblock %}
+{% block content_title_small %}на {% get_nameclient branch_data.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-6 col-xs-12">
+            <form action="{% if act_data %}{% url 'replace_service:addget_act' act_data.Branch.id act_data.id %}{% else %}{% url 'replace_service:addget_act' branch_data.id %}{% endif %}" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form layout='horizontal' %}
+                {% buttons %}
+                    <a class="btn btn-danger" href="{% url 'index:card_client' branch_data.id %}">Вернуться к клиенту</a>
+                    {% if perms.replace_service.act_item_edit %}
+                        {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                    {% endif %}
+                {% endbuttons %}
+            </form>
+        </div>
+        <div class="col-sm-6 col-xs-0">
+            {% if invoice %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-header bg-transparent border-success">
+                            <h4>Расход со склада по акту</h4>
+                        </div>
+                        <ul>
+                            <li style="padding-top: 10px">
+                                <strong>{% if invoice.type_invoice.slug == 'consumption' %}Р{% else %}В{% endif %}</strong>
+                                Накладная №{{ invoice.number }} от {{ item.date_invoice|date:"d.m.Y" }} на сумму <mark>{{ invoice.price }}</mark> рублей
+                                {% if children_invoice %}
+                                    <ul style="padding: 10px 0 10px 30px">
+                                        {% for item in children_invoice %}
+                                            <li>
+                                                + <strong>{% if invoice.type_invoice.slug == 'consumption' %}Р{% else %}В{% endif %}</strong>
+                                                Накладная №{{ item.number }} от {{ item.date_invoice|date:"d.m.Y" }} на сумму <mark>{{ item.price }}</mark> рублей
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </li>
+                        </ul>
+                        <div class="card-footer bg-transparent border-success"><h5>Итого: {{ total_invoices }} рублей</h5></div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-dark" role="alert">Данные о расходе со склада отсутствуют</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

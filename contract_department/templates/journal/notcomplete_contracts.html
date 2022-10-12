@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static other_tags %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 30%">Контрагент</th>
+                    <th style="width: 20%">Договор</th>
+                    <th style="width: 45%">Недочёты</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in contracts %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            {% if branch %}
+                                {{ branch.NameBranch }}
+                            {% else %}
+                                {% if branch.Client.NameClient_short %}
+                                    {{ branch.Client.NameClient_short }}
+                                {% else %}
+                                    {{ branch.Client.NameClient_full }}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>{{ item.Name }}<br/>{{ item.NumContract }} от {{ item.DateConclusion }}</td>
+                        <td>{{ item.id|error_contracts:item.TypeDocument_id }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'templatetags/pagination.html' with page_obj=list %}
+{% endblock %}

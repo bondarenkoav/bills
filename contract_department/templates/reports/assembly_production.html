@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static other_tags trade_tags bootstrap4 humanize %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="d-none d-sm-block d-print-none">
+        <form action="{% url 'contract_department:report-assembly-production' %}" method="post" class="form-inline">
+            {% csrf_token %}
+            {% bootstrap_form form layout='inline' %}
+            {% bootstrap_button "Показать" button_type="submit" button_class="btn-primary" %}
+        </form>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr class="text-center">
+                    <th style="width: 5%">#</th>
+                    <th style="width: 20%">Контрагент</th>
+                    <th style="width: 10%">Договор</th>
+                    <th style="width: 25%">Объект</th>
+                    <th style="width: 10%">Тип системы</th>
+                    <th style="width: 10%">Стоимость по договору</th>
+                    <th style="width: 10%">Оплачено</th>
+                    <th style="width: 10%">Стоимость оборудования</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{% get_nameclient item.branch_id %}</td>
+                        <td>
+                            {% if item.typedocument_slug == 'build_service_contract' %}
+                                {{ item.contract_internal }} {% if item.contract_branch %}({{ item.contract_branch }}){% endif %} от {{ item.date_conclusion|date:"d.m.Y" }}</td>
+                            {% else %}
+                                Акт №{{ item.id }} от {{ item.date_conclusion|date:"d.m.Y" }}
+                            {% endif %}
+                        <td>{{ item.object_name }} ({{ item.object_address }})</td>
+                        <td class="text-center">{% if item.typedocument_slug == 'build_service_contract' %}{% get_typesystem_build item.id %}{% endif %}</td>
+                        <td class="text-center">{{ item.price|intcomma:2 }}</td>
+                        <td class="text-center">{% get_payment_build_contract item.id as paid %}{{ paid|intcomma:2 }}</td>
+                        <td class="text-center">{% get_cost_equipment item.typedocument_slug item.contract_id %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

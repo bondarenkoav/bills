@@ -1,0 +1,12 @@
+<select class="form-control" title="Контрагенты" name="branch_{{ npp }}">
+    {% if contract %}
+        {% for option in branches %}
+            <option selected value="{{ option.id }}"><small>{{ option.NameClient_full|truncatechars:50 }} дог.№{{ option.NumDocument }}</small></option>
+        {% endfor %}
+    {% else %}
+        {% for option in branches %}
+            <option selected value="{{ option.id }}"><small>{{ option.NameClient_full|truncatechars:50 }} дог.№{{ option.NumDocument }}</small></option>
+        {% endfor %}
+    {% endif %}
+    <option value="none">Не переносить...</option>
+</select>

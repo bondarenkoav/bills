@@ -1,0 +1,53 @@
+<ul class="nav navbar-top-links navbar-right">
+    <!---------------- Уведомления -------------------------------->
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-messages">
+            {% block notification %}{% endblock %}
+            <li class="divider"></li>
+            <li>
+                <a class="text-center" href="#">
+                    <strong>Читать все уведомления</strong>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+        <!-- /.dropdown-messages -->
+    </li>
+    <!---------------- Сообщения -------------------------------->
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="fa fa-bell fa-fw"></i>  <i class="fa fa-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-alerts">
+            {% block messages %}{% endblock %}
+            <li class="divider"></li>
+            <li>
+                <a class="text-center" href="#">
+                    <strong>Читать все сообщения</strong>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </li>
+    <!---------------- Пользовательское меню -------------------------------->
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="fa fa-user fa-fw"></i> {{ user.last_name }} <i class="fa fa-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-user">
+            <li>
+                <a href="{% url 'accounts:profile' %}"><i class="fa fa-user fa-fw"></i> Профиль</a>
+            </li>
+            <li class="divider"></li>
+            <li>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}"> Выход</a>
+                {% endif %}
+                <a href="{% url 'logout' %}"><i class="fa fa-sign-out fa-fw"></i> Выход</a>
+            </li>
+        </ul>
+    </li>
+</ul>

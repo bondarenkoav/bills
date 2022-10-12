@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load bootstrap4 other_tags %}
+
+{% block content_title %}
+    {% if contract_data %}№ {{ contract_data.NumContractInternal }} от {{ contract_data.DateConclusion }}{% else %}Новый{% endif %}
+{% endblock %}
+{% block content_area %}Договор монтажа{% endblock %}
+{% block content_title_small %}на {% get_nameclient branch_data.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-5 col-xs-12">
+
+            <ul class="nav nav-tabs" id="card_datacontract" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="contract-tab" data-toggle="tab" href="#contract" role="tab" aria-controls="contract" aria-selected="true">Основные данные</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="sub_contract-tab" data-toggle="tab" href="#sub_contract" role="tab" aria-controls="sub_contract" aria-selected="false">Доп. соглашения</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="scan_documents-tab" data-toggle="tab" href="#scan_documents" role="tab" aria-controls="sub_contract" aria-selected="false">Сканированные документы</a>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3" id="TabContentDataClient">
+                <div class="tab-pane fade show active" id="contract" role="tabpanel" aria-labelledby="contract-tab">
+                    {% if file_scan_contract == None %}
+                        <div class="alert alert-danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            Необходимо загрузить сканированную копию договора.
+                        </div>
+                    {% endif %}
+
+                    <form action="{% if contract_data %}{% url 'build_service:addget_contract' contract_data.Branch.id contract_data.id %}{% else %}{% url 'build_service:addget_contract' branch_data.id %}{% endif %}" method="post">
+                        {% csrf_token %}
+                        {% bootstrap_form form layout='horizontal' %}
+                        {% buttons %}
+                            <a class="btn btn-warning" href="{% url 'index:card_client' branch_data.id %}" role="button">Вернуться к клиенту</a>
+                            {% if perms.build_service.contract_item_edit %}
+                                {% bootstrap_button "Сохранить договор" button_type="submit" button_class="btn-primary" %}
+                            {% endif %}
+                            {% if contract_data %}
+                                <a class="btn btn-primary" href="{% url 'build_service:print_contract' contract_data.Branch.id contract_data.id %}" role="button">Печать договора</a>
+                                <a class="btn btn-success" href="{% url 'build_service:addget_object' contract_data.Branch.id contract_data.id %}" role="button">Добавить объект</a>
+                            {% endif %}
+                        {% endbuttons %}
+                    </form>
+
+                    {% if contract_data %}
+                        <div class="alert alert-secondary" role="alert">
+                            <p>Стоимость оказания услуг:</p>
+                            <dl class="row">
+                                <dt class="col-sm-5">Все объекты: </dt><dd class="col-sm-7">{% if SumPriceAllObject.price %}{{ SumPriceAllObject.price }}{% else %}0,00{% endif %} рублей</dd>
+                                <dt class="col-sm-5">Смонтировано: </dt><dd class="col-sm-7">{% if SumPriceMounted.price %}{{ SumPriceMounted.price }}{% else %}0,00{% endif %} рублей</dd>
+                            </dl>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade show" id="sub_contract" role="tabpanel" aria-labelledby="sub_contract-tab">
+                    {% if contract_data %}
+                        <div>
+                            <a href="{% if perms.build_service.subcontract_item_add %}{% url 'build_service:addget_subcontract' contract_data.Branch.id contract_data.id %}{% else %}#{% endif %}" class="list-group-item">Добавить дополнительное соглашение</a>
+                        </div>
+                        <hr/>
+                        <div class="list-group">
+                            {% for item in list_subcontracts %}
+                                <a href="{% if perms.build_service.subcontract_item_view %}{% url 'build_service:addget_subcontract' contract_data.Branch.id contract_data.id item.id %}{% else %}#{% endif %}" class="list-group-item">Дополнительное соглашение №{{ item.NumSubContract }} {{ item.Template.NameTemplate }} от {{ item.DateSubContract }}</a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Для добавления дополнительного соглашения, необходимо сохранить основной договор.</p>
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane" id="scan_documents" style="padding: 5px;">
+                    {% if contract_data %}
+                        {% include "scan_contract.html" with urlstr='build_service:addget_scan_contract' form=form_scancontract contract=contract_data file=file_scan_contract %}
+                        {% include "scan_subcontract.html" with urlstr='build_service:addget_scan_subcontract' form=form_scansubcontract branch=contract_data.Branch.id contract=contract_data.id file=file_scan_contract.id %}
+                    {% else %}
+                        <p>Для добавления сканов документов, необходимо сохранить основной договор.</p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-sm-7 col-xs-12">
+            {% if contract_data %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th width="5%">#</th>
+                            <th width="10%">Тип</th>
+                            <th width="15%">Наименование</th>
+                            <th width="35%">Адрес объекта</th>
+                            <th width="8%">ФО</th>
+                            <th width="12%">Стоимость</th>
+                            <th width="15%">Период</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for object in objects %}
+                        <tr class="{{ object.NameClassBootstrap }}" id="obj_{{ object.id }}" onclick="location.href = '{% if perms.build_service.object_item_view %}{% url 'build_service:addget_object' contract_data.Branch.id contract_data.id object.id %}{% else %}#{% endif %}';">
+                            <td>{{ forloop.counter|add:page_add }}</td>
+                            <td>{{ object.TypeObject.ShortName }}</td>
+                            <td>{{ object.NameObject }}</td>
+                            <td>{{ object.AddressObject }}</td>
+                            <td>{{ object.PaymentMethods }}</td>
+                            <td>{{ object.Price }}</td>
+                            <td>
+                                {% if object.DateStart %}
+                                    {{ object.DateStart|date:"d.m.Y" }} -
+                                    {% if object.DateEnd %}
+                                        {{ object.DateEnd|date:"d.m.Y" }}
+                                    {% else %}
+                                        н/д
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% include 'templatetags/pagination.html' with page_obj=objects %}
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}
+

@@ -1,0 +1,25 @@
+{% load other_tags %}
+
+{% for item in events %}
+    <div class="timeline-task">
+        <div class="icon bg1">
+            <i class="fa fa-envelope"></i>
+        </div>
+        <div class="tm-title">
+            <h4>{{ item.event_code.Name }}</h4>
+            <span class="time"><i class="ti-time"></i>{{ item.add_date }}</span>
+        </div>
+        <p>
+            {% if item.contract_id %}
+                {% if item.type_dct.type == 'contract' %}
+                    {{ item.contract_id|get_dct_info:item.type_dct.slug }}
+                {% elif item.type_dct.type == 'act' %}
+                    {{ item.contract_id|get_dct_info:item.type_dct.slug }}
+                {% endif %}
+            {% endif %}
+            {% if item.object_id %}
+                <p>Объект: {{ object.NameObject }} по адресу {{ object.AddressObject }}</p>
+            {% endif %}
+        </p>
+    </div>
+{% endfor %}

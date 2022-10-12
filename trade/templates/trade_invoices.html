@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load bootstrap4 personal_tags other_tags %}
+
+{% block body_title %}
+    {% if document.TypeDocument.type == 'contract' %}
+        Выдача со склада по договору: {{ document.NumContractInternal }} от {{ document.DateConclusion }}
+    {% else %}
+        Выдача со склада по акту: №{{ document.id }}({{ document.Object.NameObject }}-{{ document.AddressObject }}) от {{ document.DateWork }}
+    {% endif %}
+    на {% get_nameclient document.Branch.id %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-7 col-sm-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr align="center">
+                        <td width="10%">№ 1С</td>
+                        <td width="20%">Дата 1С</td>
+                        <td width="20%">Сумма</td>
+                        <td width="25%">Склад</td>
+                        <td width="25%">МОЛ</td>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in list_invoices %}
+                    <tr align="center" onclick="location.href = '{% url 'trade_department:add&get_invoice' document.Branch.id document.TypeDocument.app document.TypeDocument.type document.id item.id %}';">
+                        <td>{{ item.number }}</td>
+                        <td>{{ item.date_invoice }}</td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.ServingCompany }}</td>
+                        <td>{{ item.CoWorker.Person_FIO|get_shortfio }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <thead>
+                    <tr>
+                        <td colspan="2" align="right">Итого:</td>
+                        <td align="center">{{ total_invoices.total }}</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="col-md-5 col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Ввод новой накладной</h3>
+            </div>
+            <div class="panel-body">
+                <form action="{% url 'trade_department:add&get_invoice' document.Branch.id document.TypeDocument.app document.TypeDocument.type document.id %}" method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form layout='horizontal' %}
+                    <div class="text-right">
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary">
+                                Сохранить
+                            </button>
+                        {% endbuttons %}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block nav_footer_left %}
+    <a href="{% url 'index:card_client' document.Branch.id %}" class="list-group-item">&laquo; Вернуться в карту клиента</a>
+{% endblock %}

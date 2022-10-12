@@ -1,0 +1,25 @@
+{% load other_tags %}
+
+<td>
+    {% if event.event_date %}{{ event.event_date }}{% else %}-----{% endif %}<br/>
+    <small>записано {{ event.add_date|date:"d.m.Y" }}</small>
+</td>
+<td>{{ event.app.name }}</td>
+<td><small>{{ branch }}</small></td>
+<td>{{ contract.NumContractBranch }}({{ contract.NumContractInternal }}) от {{ contract.DateConclusion }}</td>
+<td>
+    {% if object %}
+        {% if object.NumObjectPCN %}№{{ object.NumObjectPCN }}-{% endif %}{{ object.NameObject }} ({{ object.AddressObject }})<br>
+        <small>
+            Текущая абонплата: {% if object.ChgPriceDifferent == False %}{{ object.PriceNoDifferent }}{% elif object.Price %}{{ object.Price }}{% else %}---{% endif %} руб.
+            {% if object.PaymentMethods %} / {{ object.PaymentMethods }}{% endif %}
+        </small>
+    {% endif %}
+</td>
+<td>
+    {{ event.event_code }}<br>
+    {% if event.old_value %}
+        <small>({{ event.old_value }} -> {{ new_value }})</small>
+    {% endif %}
+</td>
+<td>{{ event.user.username }}</td>

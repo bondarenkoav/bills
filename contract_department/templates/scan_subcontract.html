@@ -1,0 +1,23 @@
+{% load bootstrap4 %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">Дополнительные соглашения</div>
+    <div class="panel-body">
+        <div class="list-group">
+            {% for item in file_scan_subcontract %}
+                <a href="{% url urlstr branch contract file %}" class="list-group-item">Соглашение №{{ item.TechSecuritySubContract.NumSubContract }}</a>
+            {% endfor %}
+        </div>
+        <form action="{% comment %}{% url 'tech_security:add&get_scan_subcontract' contract_data.Branch.id contract_data.id  %}{% endcomment %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xs-10">{% bootstrap_form form_scansubcontract layout='horizontal' %}</div>
+                <div class="col-sm-2">
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary">Загрузить</button>
+                    {% endbuttons %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}<a href="{% url 'reference_books:addget_typeswork' %}">Добавить</a>{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <td style="width: 5%;">№ п/п</td>
+                    <td style="width: 95%;">Наименование работ</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in list %}
+                    <tr id="obj_{{ item.id }}" onclick="location.href = '{% url 'reference_books:addget_typeswork' item.id %}';">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.Name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'templatetags/pagination.html' with page_obj=list %}
+{% endblock %}

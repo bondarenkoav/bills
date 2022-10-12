@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 %}
+
+{% block head_content %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/suggestions-15.12.css" %}"  />
+{% endblock %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}{% if data %}{{ data.Name }}{% else %}новый{% endif %}{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <form action="{% if data %}{% url 'reference_books:addget_group' data.id %}{% else %}{% url 'reference_books:addget_group' %}{% endif %}" method="post" class="form">
+                {% csrf_token %}
+                {% bootstrap_form form layout='horizontal' %}
+                {% buttons %}
+                    <a class="btn btn-warning" href="{% url 'reference_books:getlist_group' %}" role="button">Вернуться к списку</a>
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                {% endbuttons %}
+            </form>
+        </div>
+    </div>
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+	<script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+{% endblock %}

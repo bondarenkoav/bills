@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content_title %}
+    {% if contract_data %}{{ title }}{% endif %}
+{% endblock %}
+{% block content_area %}Договор ТО{% endblock %}
+{% block content_title_small %}{% endblock %}
+
+{% block include_header %}
+    <script>
+        // Установить/снять все чекбоксы
+        function checkAll(bx) {
+            var cbs = document.getElementsByTagName('input');
+            if(document.getElementById('change_checkboxes').checked){
+                document.getElementById('text_label').innerText = 'Снять все'
+            }
+            else {
+                document.getElementById('text_label').innerText = 'Выбрать все'
+            }
+            for(var i=0; i < cbs.length; i++) {
+                if(cbs[i].type == 'checkbox') {
+                    cbs[i].checked = bx.checked;
+                }
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-7 col-xs-12">
+            <form action="{% url 'maintenance_service:copy_objects' contract_data.id %}" method="post">
+                {% csrf_token %}
+                {% bootstrap_messages %}
+                {% bootstrap_form_errors form %}
+                {% bootstrap_form form layout='horizontal' %}
+                <table class="table">
+                    <thead>
+                        <tr class="text-center">
+                            <th style="width: 20%;" colspan="2">
+                                <input id="change_checkboxes" type="checkbox" onclick="checkAll(this)">
+                                <label for="change_checkboxes" id="text_label">Выбрать все</label>
+                            </th>
+                            <th style="width: 30%;">Наименование</th>
+                            <th style="width: 40%;">Адрес</th>
+                            <th style="width: 10%;">Состояние</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in object_list %}
+                        <tr>
+                            <th class="text-center">
+                                {{ forloop.counter }}
+                            </th>
+                            <td>
+                                <input type="checkbox" name="tag[]" value="{{ item.id }}">
+                            </td>
+                            <td>
+                                {{ item.NameObject }}
+                            </td>
+                            <td>{{ item.AddressObject }}</td>
+                            <td>{{ item.StatusSecurity }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% buttons %}
+                    <a class="btn btn-warning" href="{% url 'maintenance_service:addget_contract' contract_data.Branch.id contract_data.id %}" role="button">Отменить</a>
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                {% endbuttons %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

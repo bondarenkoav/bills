@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load bootstrap4 other_tags %}
+
+{% block content_title %}
+    {% if contract_data %}№ {{ contract_data.NumContractInternal }} от {{ contract_data.DateConclusion }}{% else %}Новый{% endif %}
+{% endblock %}
+{% block content_area %}Договор техн. охраны{% endblock %}
+{% block content_title_small %}на {% get_nameclient branch_data.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-5 col-xs-12">
+
+            <ul class="nav nav-tabs" id="card_datacontract" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="contract-tab" data-toggle="tab" href="#contract" role="tab" aria-controls="contract" aria-selected="true">Основные данные</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="sub_contract-tab" data-toggle="tab" href="#sub_contract" role="tab" aria-controls="sub_contract" aria-selected="false">Доп. соглашения</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="scan_documents-tab" data-toggle="tab" href="#scan_documents" role="tab" aria-controls="sub_contract" aria-selected="false">Сканированные документы</a>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3" id="TabContentDataClient">
+                <div class="tab-pane fade show active" id="contract" role="tabpanel" aria-labelledby="contract-tab">
+
+                    {% if file_scan_contract == None %}
+                        <div class="alert alert-danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            Необходимо загрузить сканированную копию договора.
+                        </div>
+                    {% endif %}
+
+                    {% include "templatetags/contract_form.html" with urlstr='tech_security:addget_contract' form=form branch=branch_data contract=contract_data perms=perms %}
+
+                    {% if contract_data %}
+                        <div class="alert alert-secondary" role="alert">
+                            <p>Стоимость оказания услуг:</p>
+                            <dl class="row">
+                                <dt class="col-sm-5">Все объекты: </dt><dd class="col-sm-7">{% if SumPriceAllObject.price %}{{ SumPriceAllObject.price }}{% else %}0,00{% endif %} рублей</dd>
+                                <dt class="col-sm-5">В охране: </dt><dd class="col-sm-7">{% if SumPriceInWork.price %}{{ SumPriceInWork.price }}{% else %}0,00{% endif %} рублей</dd>
+                            </dl>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade show" id="sub_contract" role="tabpanel" aria-labelledby="sub_contract-tab">
+                    {% if contract_data %}
+                        <div>
+                            <a href="{% if perms.tech_security.subcontract_item_add %}{% url 'tech_security:addget_subcontract' contract_data.Branch.id contract_data.id %}{% else %}#{% endif %}" class="list-group-item">Добавить дополнительное соглашение</a>
+                        </div>
+                        <hr/>
+                        <div class="list-group">
+                            {% for item in list_subcontracts %}
+                                <a href="{% if perms.tech_security.subcontract_item_view %}{% url 'tech_security:addget_subcontract' contract_data.Branch.id contract_data.id item.id %}{% else %}#{% endif %}" class="list-group-item">Дополнительное соглашение №{{ item.NumSubContract }} {{ item.Template.NameTemplate }} от {{ item.DateSubContract }}</a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>Для добавления дополнительного соглашения, необходимо сохранить основной договор.</p>
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade show" id="scan_documents" role="tabpanel" aria-labelledby="scan_documents-tab">
+                    {% if contract_data %}
+                        {% if perms.tech_security.contract_item_add %}
+                            {% include "scan_contract.html" with urlstr='tech_security:addget_scan_contract' form=form_scan_contract contract=contract_data file=file_scan_contract %}
+                            {% include "scan_subcontract.html" with urlstr='tech_security:addget_scan_subcontract' form=form_scan_subcontract branch=contract_data.Branch.id contract=contract_data.id file=file_scan_contract.id %}
+                            {% include "scan_object.html" with urlstr='tech_security:addget_scan_certofownership' form=form_scan_object branch=contract_data.Branch.id contract=contract_data.id file=file_scan_contract.id %}
+                        {% endif %}
+                    {% else %}
+                        <p>Для добавления сканов документов, необходимо сохранить основной договор.</p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-sm-7 col-xs-12">
+            {% if contract_data %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th width="5%">#</th>
+                            <th width="10%">Тип</th>
+                            <th width="10%">№</th>
+                            <th width="20%">Наименование</th>
+                            <th width="25%">Адрес</th>
+                            <th width="10%">ФО</th>
+                            <th width="10%">Стоимость</th>
+                            <th width="10%">Состояние</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for object in objects %}
+                            <tr class="{{ object.NameClassBootstrap }}" id="obj_{{ object.id }}" onclick="location.href = '{% if perms.tech_security.object_item_view %}{% url 'tech_security:addget_object' contract_data.Branch.id contract_data.id object.id %}{% else %}#{% endif %}';">
+                                <td>{{ forloop.counter|add:page_add }}</td>
+                                <td>{{ object.TypeObject.ShortName }}</td>
+                                <td>{{ object.NumObjectPCN }}</td>
+                                <td>{{ object.NameObject }}</td>
+                                <td><small>{{ object.AddressObject }}</small></td>
+                                <td>{{ object.PaymentMethods }}</td>
+                                <td>{{ object.PriceNoDifferent }}</td>
+                                <td>{{ object.StatusSecurity }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% include 'templatetags/pagination.html' with page_obj=objects %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

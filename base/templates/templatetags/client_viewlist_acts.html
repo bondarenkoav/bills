@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-11">
+        <div class="card">
+            <div class="card-header" id="#heading_{{ type_document.slug }}">
+                <h4 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#acts_{{ type_document.slug }}" aria-expanded="true" aria-controls="collapseOne">
+                        <span class="glyphicon glyphicon-chevron-down"></span>
+                        {{ type_documents.Name }}
+                    </button>
+                </h4>
+            </div>
+            <div id="acts_{{ type_document.slug }}" class="collapse" aria-labelledby="heading_{{ type_document.slug }}" data-parent="#accordionExample">
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for document in documents %}
+                            <a href="{% url ':addget_act' document.TypeDocument.app document.Branch.id document.TypeDocument.type document.id %}" class="list-group-item">
+                                №{{ document.id }} от {{ document.DateWork }} ({{ document.Object }}/{{ document.AddressObject }}), на сумму - {{ document.Price }} руб.
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-1 text-center">
+        <a href="{% url addget_url branch_id %}"><i class="fa fa-plus-square fa-3x" aria-hidden="true" style="margin-top: 15px;"></i></a>
+    </div>
+</div>

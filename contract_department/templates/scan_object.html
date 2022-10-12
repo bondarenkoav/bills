@@ -1,0 +1,17 @@
+{% load bootstrap4 %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">Свидетельства на собственность</div>
+    <div class="panel-body">
+        <div class="list-group">
+            {% for item in file_scan_object %}
+                <a href="{% url urlstr branch contract file %}" class="list-group-item">Объект по адресу {{ item.TechSecurityObject.AddressObject }}</a>
+            {% endfor %}
+        </div>
+        <form action="{% comment %}{% url 'tech_security:add&get_scan_certofownership' contract_data.Branch.id contract_data.id  %}{% endcomment %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form_scanobject layout='horizontal' %}
+            {% bootstrap_button "Загрузить" button_type="submit" button_class="btn-primary" %}
+        </form>
+    </div>
+</div>

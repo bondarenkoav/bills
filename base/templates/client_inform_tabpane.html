@@ -1,0 +1,40 @@
+{% load get_viewdata_client humanize %}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title">События</h4>
+                <div class="timeline-area events">
+                    {% client_viewdata_inform_tabpane_events branch.id %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title">Финансы</h4>
+                <div class="cripto-live">
+                    <div class="list-group">
+                        {% for scompany in list_scompany %}
+                            <a href="{% url 'finance_department:payment' branch_data.id scompany.id %}" class="list-group-item list-group-item-action">
+                                <span>{{ scompany.NameBranch }}</span>
+                                <span style="margin-left: 20px;">Сальдо: {% saldo_scompany branch_data.id scompany.id as saldo %}{{ saldo|intcomma }} руб.</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title">Запланировано</h4>
+                <div class="list-group">
+                    {% client_viewdata_inform_tabpane_planned branch.id %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load other_tags %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}Список{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr class="text-center">
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 10%;">Добавления</th>
+                    <th style="width: 10%;">Назначено</th>
+                    <th style="width: 10%;">Раздел</th>
+                    <th style="width: 10%;">Контрагент</th>
+                    <th style="width: 10%;">Договор</th>
+                    <th style="width: 10%;">Объект</th>
+                    <th style="width: 15%;">Событие</th>
+                    <th style="width: 10%;">Значение</th>
+                    <th style="width: 10%;">Пользователь</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in list %}
+                <tr class="text-center">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.event_date }}</td>
+                    <td>{{ item.add_date }}</td>
+                    <td>{{ item.application }}</td>
+                    <td>{% get_nameclient item.branch_id %}</td>
+                    <td>{{ item.contract_id }}</td>
+                    <td>{{ item.object_id }}</td>
+                    <td>{{ item.event_code }}</td>
+                    <td>{{ item.event_value }}</td>
+                    <td>{{ item.user }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'templatetags/pagination.html' with page_obj=list %}
+{% endblock %}

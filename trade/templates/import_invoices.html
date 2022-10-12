@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load trade_tags other_tags %}
+
+{% block content_title %}
+    Импорт накладных из 1С.Склад
+    <a class="btn btn-warning" href="{% url 'trade_department:clear_import_invoices' city %}"> Очистить импорт</a>
+{% endblock %}
+{% block content_area %}Импорт{% endblock %}
+{% block content_title_small %}Склад{% endblock %}
+
+{% block content %}
+    <form action="{% url 'trade_department:import_invoices_from1S' %}" method="post">
+        {% csrf_token %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                {% if invoices %}
+                    <thead>
+                    <tr align="center">
+                        <td width="5%">#</td>
+                        <td width="30%">Накладная</td>
+                        <td width="10%">Документ</td>
+                        <td width="10%">Сумма</td>
+                        <td width="30%">Контрагент</td>
+                        <td width="15%">Сервисная компания</td>
+                    </tr>
+                    </thead>
+                {% endif %}
+                <tbody>
+                {% for item in invoices %}
+                    <tr>
+                        <td align="center">{{ forloop.counter }}</td>
+                        <td align="right">
+                            <small>{% if item.type_invoice == 'Возврат' %}Возвратная накладная{% else %}Расходная накладная{% endif %}</small>
+                            № {{ item.number_invoice }} от {{ item.date_invoice }}<br/>
+                            <small>Клиент 1С: {{ item.Client }} ({{ item.INN }})</small><br/>
+                            {% if item.type_invoice == 'Возврат' %}<em class="mt-2">{{ item.parent_invoice }}</em>{% endif %}
+                        </td>
+                        <td align="center">{{ item.Contract1S }}</td>
+                        <td align="center">{{ item.price }}</td>
+                        {% if item.type_invoice == 'Возврат' %}
+                            {% trade_parentinvoice item forloop.counter %}
+                        {% else %}
+                            {% trade_importinvoice item forloop.counter %}
+                        {% endif %}
+                        <td align="center">{% get_scompanybranch_name_byINNandCity item.ServingCompany_inn item.city %}</td>
+                    </tr>
+                {% empty %}
+                    <div class="alert alert-info" role="alert">Новых накладных нет</div>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% if invoices %}
+                <div class="text-right" style="margin-right: 15px">
+                    <button type="submit" class="btn btn-primary">Внести</button>
+                </div>
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

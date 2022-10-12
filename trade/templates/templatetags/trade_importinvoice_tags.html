@@ -1,0 +1,20 @@
+{% load other_tags %}
+
+<td>
+    <select class="form-control" title="Контрагенты" name="client_{{ npp }}">
+        {% if no_assignet == False %}
+            {% if list_contract %}
+                {% cut_typename_client list_contract.Branch.id as name_client %}
+                {% if name_client != 'error' %}
+                    <option selected value="contract-{{ list_contract.id }}">{{ name_client }} - {{ list_contract.TypeDocument }} {{ list_contract.NumContractInternal }}</option>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if branch_list %}
+            {% for branch in branch_list %}
+                <option value="branch-{{ branch.id }}">{% cut_typename_client branch.id %} - Без привязки к документу</option>
+            {% endfor %}
+        {% endif %}
+        <option value="none">Не переносить</option>
+    </select>
+</td>

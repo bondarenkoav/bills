@@ -1,0 +1,38 @@
+{% load other_tags accounting_tags get_viewdata_client %}
+
+<div class="row">
+    <div class="col-11">
+        <div class="card">
+            <div class="card-header" id="#heading_{{ type_documents.slug }}">
+                <h4 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#contract_{{ type_documents.slug }}" aria-expanded="true" aria-controls="collapseOne">
+                        <span class="glyphicon glyphicon-chevron-down"></span>
+                        {% replace_nametypedoc type_documents.Name %} | Всего: {% get_countdocumets branch type_documents.id %} договор(а/ов)
+                    </button>
+                </h4>
+            </div>
+            <div id="contract_{{ type_documents.slug }}" class="collapse" aria-labelledby="heading_{{ type_documents.slug }}" data-parent="#accordionExample">
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for item in documents %}
+                            <a href="{% url addget_url branch item.id %}" class="list-group-item">
+                                <strong>{% get_namescompany item.ServingCompany_id %}</strong>
+                                | {{ item.NumDocument }} от {{ item.DateConclusion }}
+                                {% if type_documents.slug == 'tech_security_contract' %}
+                                    | Объектов в охране {% get_techsecurity_countactionobj item.id %} из {% get_techsecurity_countobj item.id %}
+                                {% elif type_documents.slug == 'build_service_contract' %}
+                                    | Закончено объектов {% get_buildservice_countfinishedobj item.id %} из {% get_buildservice_countobj item.id %}
+                                {% else %}
+                                    | Обслуживается объектов {% get_maintenanceservice_countactionobj item.id %} из {% get_maintenanceservice_countobj item.id %}
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-1 text-center">
+        <a href="{% url addget_url branch %}"><i class="fa fa-plus-square fa-3x" aria-hidden="true" style="margin-top: 15px;"></i></a>
+    </div>
+</div>

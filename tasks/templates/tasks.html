@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Биллинг3.0{% endblock %}
+
+{% block body_title %}
+    Список задач
+    <span style="margin-left: 20px;"><a href="/tasks/item/None/"><abbr title="attribute">Добавить задачу</abbr></a></span>
+{% endblock %}
+
+{% block content %}
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+
+            <thead>
+                <tr>
+                    <td style="width: 1%;"></td>
+                    <td style="width: 1%;"></td>
+                    <td style="width: 18%;">Тема</td>
+                    <td style="width: 30%;">Описание</td>
+                    <td style="width: 20%;">Ответственный</td>
+                    <td style="width: 15%;">Срок выполнения</td>
+                    <td style="width: 5%;">Выполнено</td>
+                    <td style="width: 10%;">Автор</td>
+                </tr>
+            </thead>
+
+            {% for task in tasks %}
+                <tbody>
+                    <tr id="obj_{{ task.id }}" onclick="location.href = '/tasks/item/{{ task.id }}/';">
+                        <td>
+                            {% if task.high_importance %}
+                                <img src="{% static 'img/fire_36x36.png' %}" width="16px">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.Create_user != user.id %}
+                                <img src="{% static 'img/arrow_down_36x36.png' %}" width="16px" alt="Входящая задача">
+                            {% else %}
+                                <img src="{% static 'img/arrow_up_36x36.png' %}" width="16px" alt="Исходящая задача">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.read %}
+                                {{ task.title }}
+                            {% else %}
+                                <strong>{{ task.title }}</strong>
+                            {% endif %}
+                        </td>
+                        <td>{{ task.description|truncatechars:30 }}</td>
+                        <td>
+                            {% for executor in task.responsible.all %}
+                                {{ executor.last_name }},
+                            {% endfor %}
+                        </td>
+                        <td>{{ task.limitation }}</td>
+                        <td>{{ task.done }}</td>
+                        <td>{{ task.Create_user }}</td>
+                    </tr>
+                </tbody>
+            {% endfor %}
+
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block pagination %}
+
+    <ul class="pagination pagination">
+        {% if posts.has_previous %}
+            <li><a href="/reference_books/posts/page/{{ posts.previous_page_number }}/">&laquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="">&laquo;</a></li>
+        {% endif %}
+
+        {% for page in posts.paginator.page_range %}
+            {% if page == posts.value %}
+                <li class="active"><a href="/reference_books/posts/page/{{ page }}/">{{ page }}</a></li>
+            {% else %}
+                <li><a href="/reference_books/posts/page/{{ page }}/">{{ page }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if posts.has_next %}
+            <li><a href="/reference_books/posts/page/{{ posts.next_page_number }}/">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="">&raquo;</a></li>
+        {% endif %}
+    </ul>
+
+{% endblock %}

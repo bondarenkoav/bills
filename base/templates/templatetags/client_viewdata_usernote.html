@@ -1,0 +1,14 @@
+{% load personal_tags %}
+
+<div class="text-danger">Право на правку информации принадлежит авторам</div>
+<div><a href="{% url 'contract_department:usernote_add' branch_id %}" class="btn btn-default">Добавить</a></div>
+{% for item in user_note %}
+    <dl class="row">
+        <dt class="col-sm-3">
+            <a {% if user == item.user %}href="{% url 'contract_department:usernote_add' item.Branch.id item.id %}"{% endif %}
+               class="btn btn-link p-0">{{ item.Title }}</a>
+        </dt>
+        <dd class="col-sm-5">{{ item.Note }}</dd>
+        <dd class="col-sm-4">{{ item.user|view_shortfio_user }}{{ request.user }}</dd>
+    </dl>
+{% endfor %}

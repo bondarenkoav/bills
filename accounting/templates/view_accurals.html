@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load accounting_tags bootstrap4 %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <form class="form-horizontal" method="POST" action="{% url 'finance_department:view_accurals' branch_id scompany_id document date_event|date:"Ymd" %}">
+        {% csrf_token %}
+        {% comment %}{% bootstrap_formset_errors formset layout='inline' %}'{% endcomment %}
+        {{ formset.management_form }}
+        {% for form in formset %}
+            <div class="row">
+                <div class="col-1 d-none d-xs-block">
+                    {{ form.id }}{{ form.object }}
+                </div>
+                <div class="col-4" style="padding-top: 5px;">
+                    {{ forloop.counter }}. Адрес объекта: {{ form.object.value|get_object:branch_id }}
+                </div>
+                <div class="col-5">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Начислено</span>
+                        </div>
+                        {{ form.summ }}
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">руб.</span>
+                        </div>
+                        <div class="input-group-append" id="button-addon2">
+                            <a class="btn btn-danger" href="{% url 'finance_department:delete_accural' form.id.value %}">
+                                Удалить
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if forloop.last == False %}<hr/>{% endif %}
+        {% endfor %}
+        <div class="row" style="padding: 10px;">
+            <div class="col-3"><a href="{% url 'finance_department:payment' branch_id scompany_id %}" class="list-group-item">&laquo; Вернуться к сальдовой ведомости</a></div>
+            <div class="col-2">{% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}</div>
+        </div>
+    </form>
+{% endblock %}

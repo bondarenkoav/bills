@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 %}
+
+{% block include_header %}
+    <link href="{% static "css/suggestions-15.12.css" %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block include_footer %}
+    <script src="{% static "js/jquery.mask.js" %}" type="text/javascript" ></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.phone_mobile').mask('(000) 000-0000', {placeholder: "(___) ___-____"});
+            $('.phone_stat').mask('(0000) 00-0000', {placeholder: "(____) __-____"});
+            $('.bank_bik').mask('099999999', {placeholder: "0________"});
+            $('.bank_rs').mask('99999999999999999999', {placeholder: "20 знаков"});
+        });
+    </script>
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+	<script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+{% endblock %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+{% block body_title %}Шаг №4 -  {{ client_id }}{% endblock %}
+
+{% block content %}
+    <div class="wrapper-page">
+        <div class="card">
+            <div class="card-body">
+                <form action="{% url 'contract_department:addclient_company_worddata_branch' client_id kpp %}" method="post" class="form">
+                    {% bootstrap_messages form %}
+                    {% csrf_token %}
+                    {% bootstrap_form form layout='horizontal' %}
+                    {% bootstrap_button "Подтвердить и сохранить" button_type="submit" button_class="btn-primary" %}
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+	<script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+{% endblock %}

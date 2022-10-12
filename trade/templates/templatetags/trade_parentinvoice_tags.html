@@ -1,0 +1,12 @@
+{% load other_tags %}
+
+<td>
+    <select class="form-control" title="Контрагенты" name="client_{{ npp }}">
+        {% if parent_invoice %}
+            {% for invoice in parent_invoice %}
+                <option selected value="parentinvoice-{{ invoice.id }}">{% cut_typename_client invoice.Branch.id %} РН №{{ invoice.number }} от {{ invoice.date_invoice|date:'d.m.Y   ' }}</option>
+            {% endfor %}
+        {% endif %}
+        <option value="none">Расходная накладная не найдена</option>
+    </select>
+</td>

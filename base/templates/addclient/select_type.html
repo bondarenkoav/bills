@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        {% for item in type_client %}
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.DescTypeClient }}</h5>
+                        <p class="card-text">
+                            {% if item.DescTypeClient == 'Юридическое лицо' %}
+                                Подготовьте ИНН и КПП для проверки на дублирование (второй шаг), и остальные документы к четвёртому шагу.
+                            {% elif item.DescTypeClient == 'Индивидуальный предприниматель' %}
+                                Подготовьте ИНН для проверки на дублирование (второй шаг), и остальные документы к третьему шагу.
+                            {% else %}
+                                Подготовьте паспортные данные для проверки на дублирование (второй шаг), и остальные документы к третьему шагу.
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'contract_department:addclient_check_client' item.slug %}" class="btn btn-primary">Продолжить</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

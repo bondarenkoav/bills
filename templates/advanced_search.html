@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load bootstrap4 other_tags %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="card">
+{% comment %}        <div class="card-title">
+            <form action="{% url 'advanced_search' %}" method="post" class="form">
+                <div class="row">
+                    <div class="col-1">Фильтры <input type="hidden" name="text_search" value="{{ text_search }}"></div>
+                    <div class="col-2">{% bootstrap_field search_filter_form.active layout='inline' %}</div>
+                    <div class="col-1">{% bootstrap_button "Отправить" button_type="submit" button_class="btn-primary" %}</div>
+                </div>
+            </form>
+        </div>{% endcomment %}
+
+        <div class="card-head">
+            {% if results|length %}
+                <table class="table table-striped">
+                <tr>
+                    <td width="35%">Наименование</td>
+                    <td width="10%">ИНН</td>
+                    <td width="15%">Договор</td>
+                    <td width="40%">Объект</td>
+                </tr>
+                {% for r in results %}
+                    <tr id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'index:card_client' r.id %}')";>
+                        <td>
+                            <abbr title="attribute">{{ r.TypeClient_name }}</abbr>
+                            {% if r.NameClient_short %}
+                                {{ r.NameClient_short }}
+                            {% else %}
+                                {{ r.NameClient_full }}
+                            {% endif %}
+                        </td>
+                        <td>{% if r.INN %}{{ r.INN }}{% endif %}</td>
+                        <td>
+                            {% if r.Contract_internal == '' %}
+                                {% getlist_NumContracts r.id %}
+                                {{ result }}
+                            {% else %}
+                                {{ r.Contract_internal }} ({{ r.Contract_external }})
+                            {% endif %}
+                        </td>
+                        <td class="{% if r.Object %}table-{{ r.Object_status_color }}{% endif %}">
+                            {% if r.Contract_internal == '' %}
+                                {% getlist_AddrObjects r.id %}
+                            {% else %}
+                                {{ r.Object }} ({{ r.Object_address }})
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

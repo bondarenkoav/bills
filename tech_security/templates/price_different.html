@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="wrapper-page">
+        <div class="card">
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-2">Месяц</div>
+                    <div class="col-3">Сумма</div>
+                </div>
+                <div><hr/></div>
+                <form action="{% url 'tech_security:change_pricedifferent' object_data.id %}" method="post" class="form">
+                    {% csrf_token %}
+                    {{ formset.management_form }}
+                    {% bootstrap_messages %}
+                    {% bootstrap_formset_errors formset layout='inline' %}
+                    {% for form in formset %}
+                        <div class="row">
+                            <div class="input-group">
+                                <div class="col-1 d-none d-xs-block">
+                                    {% bootstrap_field form.id layout='inline' %}
+                                </div>
+                                <div class="col-2">{% bootstrap_field form.ListMonth layout='inline' %}</div>
+                                <div class="col-3">{% bootstrap_field form.Price layout='inline' %}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div><hr/></div>
+                    {% buttons %}
+                        {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                        <a class="btn btn-success" href="{% url 'tech_security:addget_object' object_data.TechSecurityContract.Branch.id object_data.TechSecurityContract.id object_data.id %}" role="button">Завершить</a>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

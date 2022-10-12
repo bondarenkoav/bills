@@ -1,0 +1,11 @@
+{% load static personal_tags %}
+
+<div class="user-profile pull-right">
+    <img class="avatar user-thumb" src="{% static 'images/author/avatar.png' %}" alt="avatar">
+    <h4 class="user-name dropdown-toggle" data-toggle="dropdown">{{ user|view_shortfio_user }} <i class="fa fa-angle-down"></i></h4>
+    <div class="dropdown-menu">
+        <a class="dropdown-item" href="#">Сообщения</a>
+        <a class="dropdown-item" href="#">Профиль</a>
+        <a class="dropdown-item" href="{% url 'logout' %}">Выйти</a>
+    </div>
+</div>

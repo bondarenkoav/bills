@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ area }}{% endblock %}
+{% block content_title_small %}{% if data %}{{ data.Name }}{% else %}новый{% endif %}{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <form action="{% if data %}{% url 'reference_books:addget_typeswork' data.id %}{% else %}{% url 'reference_books:addget_typeswork' %}{% endif %}" method="post" class="form">
+                {% csrf_token %}
+                {% bootstrap_form form layout='horizontal' %}
+                {% buttons %}
+                    <a class="btn btn-warning" href="{% url 'reference_books:getlist_typeswork' %}" role="button">Вернуться к списку</a>
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                {% endbuttons %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

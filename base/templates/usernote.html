@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <form action="
+                {% if usernote_data %}
+                    {% url 'contract_department:usernote_add' branch_id usernote_data.id %}
+                {% else %}
+                    {% url 'contract_department:usernote_add' branch_id %}
+                {% endif %}" method="post" class="form">
+                {% csrf_token %}
+                {% bootstrap_form form layout='horizontal' %}
+                {% buttons %}
+                    <a class="btn btn-warning" href="{% url 'index:card_client' branch_id %}" role="button">Вернуться к карточке контрагента</a>
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                {% endbuttons %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

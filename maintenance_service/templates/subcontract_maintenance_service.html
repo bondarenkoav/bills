@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load bootstrap4 other_tags %}
+
+{% block content_title %}
+    {% if subcontract_data %}
+        № {{ subcontract_data.NumSubContract }} от {{ subcontract_data.DateSubContract }}
+    {% else %}
+        Новое
+    {% endif %}
+{% endblock %}
+{% block content_area %}
+    Доп. соглашение к договору техн. охраны №{{ contract_data.NumContractInternal }} от {{ contract_data.DateConclusion }}
+{% endblock %}
+{% block content_title_small %}на {% get_nameclient contract_data.Branch.id %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-5 col-xs-12">
+            <form action="{% if subcontract_data %}{% url 'maintenance_service:addget_subcontract' subcontract_data.Branch.id subcontract_data.BuildServiceContract.id subcontract_data.id %}{% else %}{% url 'build_service:add&get_subcontract' contract_data.Branch.id contract_data.id %}{% endif %}" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form layout='horizontal' %}
+                <div class="text-right">
+                   {% buttons %}
+                       <a class="btn btn-warning" href="{% url 'maintenance_service:get_contract' contract_data.Branch.id contract_data.id %}" role="button">Вернуться к договору</a>
+                       {% bootstrap_button "Сохранить договор" button_type="submit" button_class="btn-primary" %}
+                       {% if contract_data %}
+                           <a class="btn btn-primary" href="{% url 'maintenance_service:print_subcontract' contract_data.Branch.id contract_data.id subcontract.id %}" role="button">Печать договора</a>
+                           <a class="btn btn-success" href="{% url 'maintenance_service:addget_object' contract_data.Branch.id contract_data.id %}" role="button">Добавить объект</a>
+                       {% endif %}
+                   {% endbuttons %}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

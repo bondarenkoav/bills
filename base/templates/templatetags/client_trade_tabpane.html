@@ -1,0 +1,59 @@
+{% load accounting_tags trade_tags %}
+
+{% if type_document %}
+    <div class="card">
+        <div class="card-header" id="#heading_{{ type_document.slug }}">
+            <h4 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#trade_{{ type_document.slug }}" aria-expanded="true" aria-controls="collapseOne">
+                    <span class="glyphicon glyphicon-chevron-down"></span>
+                    Товарные накладные по {{ type_document.Name }}
+                </button>
+            </h4>
+        </div>
+        <div id="trade_{{ type_document.slug }}" class="collapse" aria-labelledby="heading_{{ type_document.slug }}" data-parent="#accordionExample">
+            <div class="card-body">
+                <div class="list-group">
+                    {% for item in invoices_assigned %}
+                        <a href="{% url 'trade_department:addget_invoice' item.Branch.id item.id %}" class="list-group-item">
+                            {% if type_document.type == 'contract' %}
+                                {{ item.type_document.Name }} от {{ item.type_document.slug|get_contract_data:item.number_document }}.
+                            {% else %}
+                                {{ item.type_document.Name }} №{{ item.id }}.
+                            {% endif %}
+                            Выдано материалов и оборудования на сумму {{ item.id|total_invoice }} рублей
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col-11">
+            <div class="card">
+                <div class="card-header" id="#heading_not_assigned">
+                    <h4 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#trade_not_assigned" aria-expanded="true" aria-controls="collapseOne">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                            Не определено
+                        </button>
+                    </h4>
+                </div>
+                <div id="trade_not_assigned" class="collapse" aria-labelledby="heading_not_assigned" data-parent="#accordionExample">
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for item in invoices_not_assigned %}
+                                <a href="{% url 'trade_department:addget_invoice' item.Branch.id item.id %}" class="list-group-item">
+                                    Накладная №{{ item.number }} от {{ item.date_invoice }} | Выдано материалов и оборудования на сумму {{ item.id|total_invoice }} рублей
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-1 text-center">
+            <a href="{% url 'trade_department:addget_invoice' branch_id %}"><i class="fa fa-plus-square fa-3x" aria-hidden="true" style="margin-top: 15px;"></i></a>
+        </div>
+    </div>
+{% endif %}

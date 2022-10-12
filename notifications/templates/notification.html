@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body_title %}Уведомление № {{ notification.id }}{% endblock %}
+
+{% block content %}
+    <div class="content">
+        <div class="col-xs-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <dl class="dl-horizontal">
+                        <dt>Срок:</dt><dd>{{ notification.limitation }}</dd>
+                        <dt>Создано:</dt><dd>{{ notification.DateTime_add }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-8">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {{ notification.note }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

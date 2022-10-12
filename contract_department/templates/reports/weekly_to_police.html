@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body_title %}Еженедельный отчет в полицию (постановка и снятие объектов){% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <td style="width: 5%">#</td>
+                    <td style="width: 15%">Раздел</td>
+                    <td style="width: 20%">Контрагент</td>
+                    <td style="width: 15%">Договор</td>
+                    <td style="width: 15%">Объект</td>
+                    <td style="width: 10%">Дата события</td>
+                    <td style="width: 20%">Тип события</td>
+                </tr>
+            </thead>
+            {% for item in objects %}
+                <tbody>
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.application }}</td>
+                        <td>{{ item.NameBranch }}</td>
+                        <td>{{ item.contract_id }}</td>
+                        <td>{{ item.object_id }}</td>
+                        <td>{{ item.event_date }}</td>
+                        <td>{{ item.Name }}</td>
+                    </tr>
+                </tbody>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
+
+{% block nav_footer_tools %}
+    <div class="btn-group btn-group">
+        <a href="{% url 'contract_department:report_weekly_topolice_print' %}" class="btn btn-default btn" rel="external" role="button">
+            Подготовить к печати
+            <span class="glyphicon glyphicon-print"></span>
+        </a>
+    </div>
+{% endblock %}
