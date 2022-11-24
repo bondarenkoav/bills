@@ -391,6 +391,7 @@ class logging(models.Model):
     branch_id = models.IntegerField(u'Идентификатор клиента', blank=True, null=True)
     contract_id = models.IntegerField(u'Идентификатор договора', blank=True, null=True)
     object_id = models.IntegerField(u'Идентификатор объекта', blank=True, null=True)
+    act_id = models.IntegerField(u'Идентификатор акта', blank=True, null=True)
     event_code = models.ForeignKey(Event, verbose_name='Событие', on_delete=models.CASCADE)
     event_date = models.DateField(u'Дата события', blank=True, null=True)
     old_value = models.CharField(u'Старое значение', max_length=300, blank=True, null=True)

@@ -18,7 +18,7 @@
     {% endif %}
 {% endblock %}
 {% block content_area %}
-    Объект договора монтажа {{ contract_data.NumContractInternal }} от {{ contract_data.DateConclusion }}
+    Объект договора замен {{ contract_data.NumContractInternal }} от {{ contract_data.DateConclusion }}
 {% endblock %}
 {% block content_title_small %}на {% get_nameclient contract_data.Branch.id %}{% endblock %}
 
@@ -37,14 +37,20 @@
             <div class="tab-content mt-3" id="TabContentDataClient">
 
                 <div class="tab-pane fade show active" id="base" role="tabpanel" aria-labelledby="base-tab">
-                    <form action="{% if object_data %}{% url 'replace_service:addget_object' object_data.replaceServiceContract.Branch.id object_data.replaceServiceContract.id object_data.id %}{% else %}{% url 'replace_service:addget_object' contract_data.Branch.id contract_data.id %}{% endif %}" method="post">
+                    <form action="
+                        {% if object_data %}
+                            {% url 'replace_service:addget_object' contract_data.id object_data.id %}
+                        {% else %}
+                            {% url 'replace_service:addget_object' contract_data.id %}
+                        {% endif %}" method="post">
                         {% csrf_token %}
+                        {% bootstrap_form_errors form %}
+                        {% bootstrap_messages form %}
                         {% bootstrap_form form layout='horizontal' %}
                         {% buttons %}
                             <a class="btn btn-warning" href="{% url 'replace_service:addget_contract' contract_data.Branch.id contract_data.id %}" role="button">Вернуться к договору</a>
                             {% if perms.replace_service.object_item_edit %}
                                 {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#openform_map">Координаты</button>
                             {% endif %}
                         {% endbuttons %}
                     </form>

@@ -3,7 +3,8 @@ from django.conf.urls import url
 
 from tech_security.views import upload_object_pdf, add_get_object, equip_installed_object, rent_object, \
     connection_object, addget_subcontract_pdf, view_subcontract_template, add_get_subcontract, addget_contract_pdf, \
-    view_checklist_contract, view_contract_template, add_get_contract, copy_objects, object_pricedifferent
+    view_checklist_contract, view_contract_template, add_get_contract, copy_objects, object_pricedifferent, \
+    objects_deactivate, objects_activate
 from tech_security import cron as ts_cron
 
 __author__ = 'bondarenkoav'
@@ -22,22 +23,21 @@ urlpatterns = [
 
     url(r'^branch-(?P<branch_id>\d+)/contract/id-(?P<contract_id>\d+)/subcontract/id-(?P<subcontract_id>\d+)/scanfile/(?:id-(?P<file_id>\d+)/)?$',
         addget_subcontract_pdf, name='addget_scan_subcontract'),
-    url(r'^branch-(?P<branch_id>\d+)/contract/id-(?P<contract_id>\d+)/subcontract/id-(?P<subcontract_id>\d+)/print/',
-        view_subcontract_template, name='print_subcontract'),
     url(r'^branch-(?P<branch_id>\d+)/contract/id-(?P<contract_id>\d+)/subcontract/(?:id-(?P<subcontract_id>\d+)/)?',
         add_get_subcontract, name='addget_subcontract'),
 
     url(r'^branch-(?P<branch_id>\d+)/contract/id-(?P<contract_id>\d+)/scanfile/(?:id-(?P<file_id>\d+)/)?$',
         addget_contract_pdf, name='addget_scan_contract'),
 
-    url(r'^branch-(?P<branch_id>\d+)/contract/id-(?P<contract_id>\d+)/checklist/$',
-        view_checklist_contract, name='checklist_contract'),
+    url(r'^contract/id-(?P<contract_id>\d+)/checklist/$', view_checklist_contract, name='checklist_contract'),
 
-    url(r'^branch-(?P<branch_id>\d+)/contract/id-(?P<contract_id>\d+)/print/$',
-        view_contract_template, name='print_contract'),
+    url(r'contract/id-(?P<contract_id>\d+)/objects-activate/$', objects_activate, name='objects_activate'),
+    url(r'contract/id-(?P<contract_id>\d+)/objects-deactivate/$', objects_deactivate, name='objects_deactivate'),
 
-    url(r'^branch-(?P<branch_id>\d+)/contract/(?:id-(?P<contract_id>\d+)/)?$',
-        add_get_contract, name='addget_contract'),
+    url(r'^contract/id-(?P<contract_id>\d+)/print/$', view_contract_template, name='print_contract'),
+    url(r'^subcontract/id-(?P<subcontract_id>\d+)/print/', view_subcontract_template, name='print_subcontract'),
+
+    url(r'^branch-(?P<branch_id>\d+)/contract/(?:id-(?P<contract_id>\d+)/)?$', add_get_contract, name='addget_contract'),
 
     url(r'^contract-(?P<contract_id>\d+)/copy_objects/$', copy_objects, name='copy_objects'),
 

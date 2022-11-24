@@ -1,6 +1,7 @@
 import datetime
 from django import forms
 from django.forms import ModelForm
+
 from .models import MaintenanceServiceContract, MaintenanceServiceObject, MaintenanceServiceAct, \
     MaintenanceServiceSubContract, MaintenanceTemplateSubContract, MaintenanceServiceContract_scan, \
     MaintenanceServiceSubContract_scan
@@ -130,6 +131,7 @@ class form_subcontract(forms.ModelForm):
 
     DateSubContract = forms.DateField(label='Дата допсоглашения', input_formats=('%Y-%m-%d', ),
                                       widget=forms.DateInput(format='%Y-%m-%d',attrs={'type':'date'}))
+
     class Meta:
         model = MaintenanceServiceSubContract
         fields = ['NumSubContract', 'DateSubContract', 'MaintenanceServiceObject', 'Template']

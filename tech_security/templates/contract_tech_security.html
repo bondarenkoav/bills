@@ -1,15 +1,28 @@
 {% extends 'base.html' %}
 {% load bootstrap4 other_tags %}
 
+{% block include_header %}
+    <style>
+        .nav-pills .nav-link {
+            padding: 0.75rem 0.75rem;
+            line-height: 15px;
+        }
+        .list-group-item {
+            padding:.5rem 1.0rem;
+            margin-bottom:-3px;
+        }
+    </style>
+{% endblock %}
+
 {% block content_title %}
     {% if contract_data %}№ {{ contract_data.NumContractInternal }} от {{ contract_data.DateConclusion }}{% else %}Новый{% endif %}
 {% endblock %}
-{% block content_area %}Договор техн. охраны{% endblock %}
+{% block content_area %}Договор техохраны{% endblock %}
 {% block content_title_small %}на {% get_nameclient branch_data.id %}{% endblock %}
 
 {% block content %}
     <div class="row">
-        <div class="col-sm-5 col-xs-12">
+        <div class="col-sm-5 col-xs-12 sticky-top">
 
             <ul class="nav nav-tabs" id="card_datacontract" role="tablist">
                 <li class="nav-item">
@@ -24,8 +37,8 @@
             </ul>
 
             <div class="tab-content mt-3" id="TabContentDataClient">
-                <div class="tab-pane fade show active" id="contract" role="tabpanel" aria-labelledby="contract-tab">
 
+                <div class="tab-pane fade show active" id="contract" role="tabpanel" aria-labelledby="contract-tab">
                     {% if file_scan_contract == None %}
                         <div class="alert alert-danger alert-dismissable">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -46,6 +59,7 @@
                     {% endif %}
                 </div>
 
+                <!-- --------------------- Список допсоглашений ---------------------- -->
                 <div class="tab-pane fade show" id="sub_contract" role="tabpanel" aria-labelledby="sub_contract-tab">
                     {% if contract_data %}
                         <div>
@@ -61,54 +75,30 @@
                         <p>Для добавления дополнительного соглашения, необходимо сохранить основной договор.</p>
                     {% endif %}
                 </div>
+                <!-- ----------------------------------------------------------------- -->
 
+                <!-- ---------------- Загрузка и отображение сканов ------------------ -->
                 <div class="tab-pane fade show" id="scan_documents" role="tabpanel" aria-labelledby="scan_documents-tab">
                     {% if contract_data %}
                         {% if perms.tech_security.contract_item_add %}
-                            {% include "scan_contract.html" with urlstr='tech_security:addget_scan_contract' form=form_scan_contract contract=contract_data file=file_scan_contract %}
-                            {% include "scan_subcontract.html" with urlstr='tech_security:addget_scan_subcontract' form=form_scan_subcontract branch=contract_data.Branch.id contract=contract_data.id file=file_scan_contract.id %}
-                            {% include "scan_object.html" with urlstr='tech_security:addget_scan_certofownership' form=form_scan_object branch=contract_data.Branch.id contract=contract_data.id file=file_scan_contract.id %}
+                            {% include "scan_contract.html" with urlstr='tech_security:addget_scan_contract' form=form_scan_contract contract=contract_data file=file_scancontract %}
+{#                            {% include "scan_subcontract.html" with urlstr='tech_security:addget_scan_subcontract' form=form_scan_subcontract branch=contract_data.Branch.id contract=contract_data.id file=file_scan_contract.id %}#}
+                            {% comment %}{% include "scan_object.html" with urlstr='tech_security:addget_scan_certofownership' form=form_scan_object branch=contract_data.Branch.id contract=contract_data.id file=file_scan_contract.id %}{% endcomment %}
                         {% endif %}
                     {% else %}
                         <p>Для добавления сканов документов, необходимо сохранить основной договор.</p>
                     {% endif %}
                 </div>
-
+                <!-- ----------------------------------------------------------------- -->
             </div>
         </div>
 
         <div class="col-sm-7 col-xs-12">
+            <!-- ---------------- Список объектов по договору ------------------ -->
             {% if contract_data %}
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th width="5%">#</th>
-                            <th width="10%">Тип</th>
-                            <th width="10%">№</th>
-                            <th width="20%">Наименование</th>
-                            <th width="25%">Адрес</th>
-                            <th width="10%">ФО</th>
-                            <th width="10%">Стоимость</th>
-                            <th width="10%">Состояние</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for object in objects %}
-                            <tr class="{{ object.NameClassBootstrap }}" id="obj_{{ object.id }}" onclick="location.href = '{% if perms.tech_security.object_item_view %}{% url 'tech_security:addget_object' contract_data.Branch.id contract_data.id object.id %}{% else %}#{% endif %}';">
-                                <td>{{ forloop.counter|add:page_add }}</td>
-                                <td>{{ object.TypeObject.ShortName }}</td>
-                                <td>{{ object.NumObjectPCN }}</td>
-                                <td>{{ object.NameObject }}</td>
-                                <td><small>{{ object.AddressObject }}</small></td>
-                                <td>{{ object.PaymentMethods }}</td>
-                                <td>{{ object.PriceNoDifferent }}</td>
-                                <td>{{ object.StatusSecurity }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% include 'templatetags/pagination.html' with page_obj=objects %}
+                {% include "templatetags/contract_tech_security_list_objects.html" with contract_data=contract_data list_objects=objects %}
             {% endif %}
+            <!-- --------------------------------------------------------------- -->
         </div>
     </div>
 {% endblock %}

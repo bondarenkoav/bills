@@ -89,6 +89,7 @@ class ReplaceServiceObject(models.Model):
 
 class ReplaceServiceAct(models.Model):
     ReplaceServiceObject = models.ForeignKey(ReplaceServiceObject, models.SET_NULL, verbose_name='Объект', blank=True, null=True)
+    ReplaceServiceContract = models.ForeignKey(ReplaceServiceContract, verbose_name='Договор', on_delete=models.CASCADE)
     TypeDocument = models.ForeignKey(TypeDocument, verbose_name='Тип документа', on_delete=models.CASCADE)
     DateWork = models.DateField(u'Дата выполнения работ')
     TypeWork = models.ManyToManyField(TypeWork, verbose_name='Вид работ', blank=True)

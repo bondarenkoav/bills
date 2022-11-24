@@ -7,6 +7,7 @@ from base.models import Contacts, logging, action_planned, alldocuments_fulldata
 from build_service.models import BuildServiceObject, BuildServiceContract
 from maintenance_service.models import MaintenanceServiceObject, MaintenanceServiceContract
 from reference_books.models import TypeDocument, StatusSecurity
+from replace_service.models import ReplaceServiceObject, ReplaceServiceContract, ReplaceServiceAct
 from tech_security.models import TechSecurityContract, TechSecurityObject
 from trade.models import invoice
 
@@ -147,3 +148,11 @@ def get_maintenanceservice_countactionobj(contract_id):
 def get_maintenanceservice_countobj(contract_id):
     return MaintenanceServiceObject.objects.\
         filter(MaintenanceServiceContract=MaintenanceServiceContract.objects.get(id=contract_id)).count()
+
+
+@register.simple_tag()
+def get_replaceservice_countacts(contract_id):
+    contract = ReplaceServiceContract.objects.get(id=contract_id)
+    objects = ReplaceServiceObject.objects.filter(ReplaceServiceContract=contract)
+    acts = ReplaceServiceAct.objects.filter(ReplaceServiceObject__in=objects)
+    return acts.count()

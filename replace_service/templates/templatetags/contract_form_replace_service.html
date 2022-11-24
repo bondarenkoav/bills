@@ -8,6 +8,8 @@
     {% endif %}" method="post">
 
     {% csrf_token %}
+    {% bootstrap_form_errors form %}
+    {% bootstrap_messages form %}
     <div class="form-group border-bottom">
         {% bootstrap_field form.ServingCompany layout='horizontal' %}
     </div>
@@ -60,7 +62,6 @@
     <div class="form-group border-bottom">
         {% bootstrap_field form.NameOfService layout='horizontal' %}
     </div>
-
     {% buttons %}
         <a class="btn btn-warning" href="{% url 'index:card_client' branch_data.id %}" role="button">Вернуться к клиенту</a>
         {% if perms.replace_service.contract_item_edit %}
@@ -68,8 +69,12 @@
         {% endif %}
         {% if contract_data %}
 {#          <a class="btn btn-primary" href="{% url 'replace_service:print_contract' contract_data.Branch.id contract_data.id %}" role="button">Печать договора</a>#}
-            <a class="btn btn-success" href="{% url 'replace_service:addget_object' contract_data.Branch.id contract_data.id %}" role="button">Добавить объект</a>
-            <a class="btn btn-success" href="{% url 'replace_service:addget_act' contract_data.Branch.id contract_data.id %}" role="button">Добавить акт</a>
+            {% if perms.replace_service.object_item_add %}
+                <a class="btn btn-success" href="{% url 'replace_service:addget_object' contract_data.id %}" role="button">Добавить объект</a>
+            {% endif %}
+            {% if perms.replace_service.act_item_add %}
+                <a class="btn btn-success{% if flag %} disabled{% endif %}" href="{% url 'replace_service:addget_act' contract_data.id %}" role="button">Добавить акт</a>
+            {% endif %}
         {% endif %}
     {% endbuttons %}
 </form>

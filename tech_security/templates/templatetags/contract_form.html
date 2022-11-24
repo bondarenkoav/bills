@@ -79,7 +79,7 @@
             {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
         {% endif %}
         {% if contract %}
-            <a class="btn btn-primary" href="{% url 'tech_security:print_contract' contract.Branch.id contract.id %}" role="button">
+            <a class="btn btn-primary" href="{% url 'tech_security:print_contract' contract.id %}" role="button">
                 <i class="fa fa-print"></i>
             </a>
             {% if perms.tech_security.object_item_add %}
@@ -87,12 +87,23 @@
                     Добавить объект
                 </a>
             {% endif %}
-            <a class="btn btn-warning" href="{% url 'tech_security:checklist_contract' contract.Branch.id contract.id %}" role="button" target="_blank">
-                <i class="fa fa-check-circle-o"></i>
-            </a>
-            <a class="btn btn-warning" href="{% url 'tech_security:copy_objects' contract.id %}" role="button">
-                <i class="fa fa-copy"></i>
-            </a>
+            <div class="btn-group btn-group-sm" role="group" aria-label="">
+                <a class="btn btn-warning" href="{% url 'tech_security:checklist_contract' contract.id %}" role="button" target="_blank">
+                    <i class="fa fa-check-circle-o"></i>
+                </a>
+                <a class="btn btn-warning" href="{% url 'tech_security:copy_objects' contract.id %}" role="button">
+                    <i class="fa fa-copy"></i>
+                </a>
+            </div>
+            <div class="btn-group btn-group-sm" role="group" aria-label="group_object_actions">
+                Групповая обработка объектов
+                <a class="btn btn-warning" href="{% url 'tech_security:objects_activate' contract.id %}" role="button">
+                    <i class="fa fa-play"></i>
+                </a>
+                <a class="btn btn-warning" href="{% url 'tech_security:objects_deactivate' contract.id %}" role="button">
+                    <i class="fa fa-stop"></i>
+                </a>
+            </div>
         {% endif %}
     {% endbuttons %}
 </form>

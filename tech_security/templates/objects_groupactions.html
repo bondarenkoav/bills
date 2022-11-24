@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static bootstrap4 other_tags %}
+
+{% block content_title %}{{ title }}{% endblock %}
+{% block content_area %}{{ title_area }}{% endblock %}
+{% block content_title_small %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 col-sm-12">
+            {% bootstrap_formset_errors formset layout='inline' %}
+            <form method="POST" action="{{ url }}" method="post">
+            {{ formset.management_form }}
+            {% csrf_token %}
+            <table class="table table-striped">
+                <tbody>
+                {% for form in formset %}
+                    <tr>
+                        <td class="col-1 text-center">{{ forloop.counter }}</td>
+                        <td class="col-1 text-center">
+                            {{ form.id }}
+                            <input class="form-check-input" type="checkbox" name="sel_object" value="{{ form.instance.id }}">
+                        </td>
+                        <td class="col-2">{% bootstrap_field form.NumObjectPCN layout='inline' %}</td>
+                        <td class="col-3">{% bootstrap_field form.NameObject layout='inline' %}</td>
+                        <td class="col-5">{% bootstrap_field form.AddressObject layout='inline' %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            <label for="date_event">Дата события</label><br>
+                            <small>одна для всех выбраных объектов</small>
+                        </td>
+                        <td><input type="date" name="date_event" id="date_event" value=""><br></td>
+                        <td><input type="submit" value="Снять с охраны"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            </form>
+        </div>
+    </div>
+{% endblock %}

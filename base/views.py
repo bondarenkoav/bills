@@ -633,20 +633,16 @@ def select_type_client_add(request):
 
 
 def logging_event(code_event, code_date=None, old_value='', app='base', cowork='system', type_dct=None,
-                  scompany=None, branch=None, contract=None, object=None):
-    if branch:
-        branch = int(branch)
-    if contract:
-        contract = int(contract)
-    if object:
-        object = int(object)
-    if type_dct:
-        type_dct = TypeDocument.objects.get(slug=type_dct)
+                  scompany=None, id_branch=None, id_contract=None, id_object=None, id_act=None):
 
-    logging.objects.create(app=SectionsApp.objects.get(slug=app), branch_id=branch, scompany=scompany,
-                           type_dct=type_dct, contract_id=contract, object_id=object,
+    logging.objects.create(app=SectionsApp.objects.get(slug=app), scompany=scompany,
+                           type_dct=TypeDocument.objects.get(slug=type_dct),
                            event_code=Event.objects.get(slug=code_event), event_date=code_date,
-                           old_value=old_value, user=User.objects.get(username=cowork))
+                           user=User.objects.get(username=cowork), old_value=old_value,
+                           branch_id=(int(id_branch) if id_branch else 0),
+                           contract_id=(int(id_contract) if id_contract else 0),
+                           object_id=(int(id_object) if id_object else 0),
+                           act_id=(int(id_act) if id_act else 0))
 
 
 def action_planned_base(app, date_event, code_event, value, branch=None, contract=None, object=None, scompany=None,

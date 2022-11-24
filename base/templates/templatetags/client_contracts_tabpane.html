@@ -22,8 +22,12 @@
                                     | Объектов в охране {% get_techsecurity_countactionobj item.id %} из {% get_techsecurity_countobj item.id %}
                                 {% elif type_documents.slug == 'build_service_contract' %}
                                     | Закончено объектов {% get_buildservice_countfinishedobj item.id %} из {% get_buildservice_countobj item.id %}
-                                {% else %}
+                                {% elif type_documents.slug == 'maintenance_service_contract' %}
                                     | Обслуживается объектов {% get_maintenanceservice_countactionobj item.id %} из {% get_maintenanceservice_countobj item.id %}
+                                {% elif type_documents.slug == 'replace_service_contract' %}
+                                    | Заменено оборудование на объектах {% get_replaceservice_countacts item.id %}
+                                {% else %}
+                                    | Ой что-то интересненькое прилетело!
                                 {% endif %}
                             </a>
                         {% endfor %}

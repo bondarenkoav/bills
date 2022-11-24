@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta, date
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import modelformset_factory
+from django.forms import modelformset_factory, formset_factory
 
 from base.models import alldocuments_fulldata, SystemConstant
-from reference_books.models import TypeDocument
+from reference_books.models import TypeDocument, StatusSecurity
 from .models import TechSecurityContract, TechSecurityObject, TechSecurityObjectRent, \
     TechSecurityObjectTypeEquipInstalled, TechSecuritySubContract, TechTemplateSubContract, TechSecurityContract_scan, \
     TechSecurityObject_scan, TechSecuritySubContract_scan, TechSecurityObjectPriceDifferent, TechSecurityObjectOpSoSCard
@@ -17,6 +17,7 @@ class form_contract(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(form_contract, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance', None)
+
         if instance and instance.id:
             self.fields['ServingCompany'].required = False
             self.fields['ServingCompany'].widget.attrs['disabled'] = 'disabled'
@@ -65,6 +66,8 @@ class form_object_base(forms.ModelForm):
             self.fields['StatusSecurity'].required = False
             self.fields['StatusSecurity'].widget.attrs['disabled'] = 'disabled'
 
+        self.fields['CityObject'].required = True
+
     AddressObject = forms.CharField(label=u'Адрес объекта',
                                     widget=forms.widgets.TextInput(attrs={'id': 'id_AddressObject'}))
     max_time_arrival = forms.CharField(required=True, label=u'Время прибытия', initial='5',
@@ -91,6 +94,49 @@ class form_object_base(forms.ModelForm):
                 if date_event < date_startsaldo or date_event > maxdate_event.date():
                     raise ValidationError(u'Дата не удовлетворяет требованиям. Допустимый период: %s - %s' % (date_startsaldo_sc, "{:%d.%m.%Y}".format(maxdate_event.date())))
         return cleaned_data
+
+
+class form_groupobjects_actions(forms.ModelForm):
+    DateEndContractRent = forms.DateField(label=u'Дата события', input_formats=('%Y-%m-%d',),
+                                          widget=forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}))
+
+
+class form_objects_activated(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        self.contract_id = kwargs.pop('contract', None)
+        super(form_objects_activated, self).__init__(*args, **kwargs)
+
+        self.fields['objects'].queryset = TechSecurityObject.objects.filter(
+            TechSecurityContract=TechSecurityContract.objects.get(id=self.contract_id),
+            StatusSecurity=StatusSecurity.objects.get(slug='noactive'))
+
+    objects = forms.ModelChoiceField(label=u'Объекты для постановки в охрану',
+                                     queryset=TechSecurityObject.objects.all(), widget=forms.Select())
+
+
+# class form_objects_deactivated(forms.ModelForm):
+#
+#     # def __init__(self, *args, **kwargs):
+#         # self.contract_id = kwargs.pop('contract', None)
+#         # super(form_objects_deactivated, self).__init__(*args, **kwargs)
+#
+#         # self.fields['objects'].queryset = TechSecurityObject.objects.filter(
+#         #     TechSecurityContract=TechSecurityContract.objects.get(id=self.contract_id),
+#         #     StatusSecurity=StatusSecurity.objects.get(slug='active'))
+#
+#     objects = forms.ModelChoiceField(label=u'Объекты для снятия с охраны',
+#                                      queryset=TechSecurityObject.objects.all(), widget=forms.Select())
+#
+#     class Meta:
+#         model = TechSecurityObject
+#         fields = ['to_contract']
+
+ObjectsActivatedFormSet = modelformset_factory(TechSecurityObject,
+                                               fields=('NumObjectPCN', 'NameObject', 'AddressObject',), extra=0)
+
+ObjectsDeactivatedFormSet = modelformset_factory(TechSecurityObject,
+                                                 fields=('NumObjectPCN', 'NameObject', 'AddressObject',), extra=0)
 
 
 class form_copy_objects(forms.ModelForm):

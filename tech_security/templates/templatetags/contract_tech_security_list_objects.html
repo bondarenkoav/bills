@@ -1,0 +1,88 @@
+{% load bootstrap4 %}
+
+{% regroup objects by CityObject as city_list %}
+
+{% if city_list|length > 1 %}
+<!-- ------------ Список городов ---------------- -->
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="city-all-tab" data-toggle="pill" href="#city-all" role="tab" aria-controls="city-all" aria-selected="true">Все</a>
+    </li>
+    {% for city in city_list %}
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="city-{{ city.grouper.slug }}-tab" data-toggle="pill" href="#city-{{ city.grouper.slug }}" role="tab" aria-controls="city-{{ city.grouper.slug }}" aria-selected="true">{{ city.grouper|default_if_none:"Другое" }}</a>
+        </li>
+    {% endfor %}
+</ul>
+<!-- -------------------------------------------- -->
+
+<!-- ------------ Список объектов ---------------- -->
+<div class="tab-content" id="pills-tabContent">
+    <!-- ------------ Все объекты ---------------- -->
+    <div class="tab-pane fade show active" id="city-all" role="tabpanel" aria-labelledby="city-all-tab">
+{% endif %}
+        <table class="table table-sm">
+            <thead>
+            <tr class="text-center">
+                <th width="5%">#</th>
+                <th width="10%">№</th>
+                <th width="20%">Наименование</th>
+                <th width="35%">Адрес</th>
+                <th width="10%">ФО</th>
+                <th width="10%">Стоимость</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for object in objects %}
+                <tr class="table-{{ object.StatusSecurity.NameClassBootstrap }}" id="obj_{{ object.id }}"
+                    onclick="location.href = '{% if perms.tech_security.object_item_view %}{% url 'tech_security:addget_object' contract_data.Branch.id contract_data.id object.id %}{% else %}#{% endif %}';">
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td class="text-center">{{ object.NumObjectPCN }}</td>
+                    <td>{{ object.NameObject }}</td>
+                    <td>{{ object.TypeObject.ShortName }} ({{ object.AddressObject }})</td>
+                    <td class="text-center">{{ object.PaymentMethods }}</td>
+                    <td class="text-center">{{ object.PriceNoDifferent }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+{% if city_list|length > 1 %}
+    </div>
+    <!-- ----------------------------------------- -->
+
+    <!-- --------- Объекты по городам ------------ -->
+    {% for city in city_list %}
+        <div class="tab-pane fade" id="city-{{ city.grouper.slug }}" role="tabpanel" aria-labelledby="city-{{ city.grouper.slug }}-tab">
+            <ul class="list-group">
+                <table class="table table-sm">
+                <thead>
+                    <tr class="text-center">
+                        <th width="5%">#</th>
+                        <th width="10%">№</th>
+                        <th width="25%">Наименование</th>
+                        <th width="30%">Адрес</th>
+                        <th width="10%">ФО</th>
+                        <th width="10%">Стоимость</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for object in city.list %}
+                        <tr class="table-{{ object.StatusSecurity.NameClassBootstrap }}" id="obj_{{ object.id }}"
+                        onclick="location.href = '{% if perms.tech_security.object_item_view %}{% url 'tech_security:addget_object' contract_data.Branch.id contract_data.id object.id %}{% else %}#{% endif %}';">
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td class="text-center">{{ object.NumObjectPCN }}</td>
+                            <td>{{ object.NameObject }}</td>
+                            <td>{{ object.TypeObject.ShortName }} ({{ object.AddressObject }})</td>
+                            <td class="text-center">{{ object.PaymentMethods }}</td>
+                            <td class="text-center">{{ object.PriceNoDifferent }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </ul>
+        </div>
+    {% endfor %}
+    <!-- ----------------------------------------- -->
+</div>
+{% endif %}

@@ -4,16 +4,18 @@ import sys
 import locale
 
 from datetime import datetime, timedelta
+from time import strptime
+
 from django.contrib.auth.models import User
+from django.forms import formset_factory
 from django.template import Template, Context
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Sum, FloatField
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.decorators.csrf import csrf_protect
 from uuslug import slugify
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.utils.safestring import mark_safe
 from django_currentuser.middleware import get_current_user
 
@@ -37,7 +39,8 @@ from tech_security.models import TechSecurityContract, TechSecurityObject, TechS
     TechSecurityObjectPriceDifferent, TechSecurityObjectOpSoSCard
 from tech_security.forms import form_contract, form_object_base, form_subcontract, form_object_rent, \
     form_object_typeequipinstalled, form_TechSecurityContract_scan, form_TechSecuritySubContract_scan, \
-    form_TechSecurityObject_scan, PriceDifferentFormSet, OpSoSCardFormSet, form_copy_objects
+    form_TechSecurityObject_scan, PriceDifferentFormSet, OpSoSCardFormSet, form_copy_objects, form_groupobjects_actions, \
+    ObjectsDeactivatedFormSet, ObjectsActivatedFormSet
 
 apps_name = TechSecurityAppConfig.name
 
@@ -257,15 +260,15 @@ def recalculation(coworker, object, document, type_document, branch, scompany, d
 def add_get_contract(request, branch_id, contract_id=None):
     type_dct = 'tech_security_contract'
     SumPriceAllObject = SumPriceInWork = 0
-    contract_data = objects = list_subcontract = file_scancontract = file_scanobject = []
+    contract_data = list_objects = list_subcontract = file_scancontract = file_scanobject = []
 
     branch_data = Branch.objects.get(id=branch_id)
     if contract_id:
         contract_data = TechSecurityContract.objects.get(id=contract_id)
 
-        list_objects = TechSecurityObject.objects.\
-            filter(TechSecurityContract=contract_data).\
-            order_by('StatusSecurity', 'AddressObject')
+        list_objects = TechSecurityObject.objects.filter(TechSecurityContract=contract_data).order_by('CityObject')
+            #.\ values('id', 'NumObjectPCN', 'TypeObject', 'NameObject', 'AddressObject', 'CityObject', 'PaymentMethods')
+
         list_subcontract = TechSecuritySubContract.objects.filter(TechSecurityContract=contract_data)
 
         SumPriceAllObject = TechSecurityObject.objects.filter(TechSecurityContract=contract_data). \
@@ -275,15 +278,6 @@ def add_get_contract(request, branch_id, contract_id=None):
 
         file_scancontract = TechSecurityContract_scan.objects.filter(TechSecurityContract=contract_data).last()
         file_scanobject = TechSecurityObject_scan.objects.filter(TechSecurityObject__in=list_objects)
-
-        paginator = Paginator(list_objects, 15)
-        page = request.GET.get('page')
-        try:
-            objects = paginator.page(page)
-        except PageNotAnInteger:
-            objects = paginator.page(1)
-        except EmptyPage:
-            objects = paginator.page(paginator.num_pages)
 
     form = form_contract(request.POST or None,
                          instance=contract_id and TechSecurityContract.objects.get(id=contract_id))
@@ -357,13 +351,12 @@ def add_get_contract(request, branch_id, contract_id=None):
         'form_scanobject': form_TechSecurityObject_scan,
         'branch_data': branch_data,
         'contract_data': contract_data,
-        'objects': objects,
+        'objects': list_objects,
         'SumPriceAllObject': SumPriceAllObject,
         'SumPriceInWork': SumPriceInWork,
         'list_subcontract': list_subcontract,
         'file_scancontract': file_scancontract,
         'file_scanobject': file_scanobject,
-        'page_add': ((objects.number - 1) * 15 if objects else 0),
     })
 
 
@@ -595,6 +588,114 @@ def add_get_object(request, branch_id, contract_id, object_id=None):
     })
 
 
+@login_required
+@csrf_protect
+def objects_activate(request, contract_id):
+    contract_data = TechSecurityContract.objects.get(id=contract_id)
+
+    queryset = TechSecurityObject.objects.\
+        filter(TechSecurityContract=TechSecurityContract.objects.get(id=contract_id),
+               StatusSecurity=StatusSecurity.objects.get(slug='noactive'))
+
+    if request.POST:
+        formset = ObjectsActivatedFormSet(request.POST, queryset=queryset)
+        if formset.is_valid():
+            date_event = request.POST('date_event') # strptime(request.POST('date_event'), "%d.%m.%Y")
+            objects = request.POST.getlist('sel_object')
+
+            if date_event and objects:
+                for object in objects:
+                    # снимаем с охраны
+                    # закрываем период охраны
+                    object_data = TechSecurityObject.objects.get(id=object)
+                    period_tech_security(
+                        object_data, date_event, Event.objects.get(slug='change_activationSecur_object'),
+                        object_data.PriceNoDifferent, object_data.PriceNoDifferent)
+                    logging_event(
+                        'change_activationSecur_object', date_event, object_data.StatusSecurity, apps_name,
+                        request.user.username, contract_data.TypeDocument.slug, contract_data.ServingCompany,
+                        contract_data.Branch.id, contract_id, object
+                    )
+                    # начисление
+                    if object_data.ChgPriceDifferent is False:
+                        calculation(
+                            request.user.username, object, contract_id, contract_data.TypeDocument,
+                            contract_data.Branch, contract_data.ServingCompany, date_event, object_data.PriceNoDifferent)
+                    else:
+                        credited_with_paid.objects.create(
+                            object=object, dct=contract_data.id, type_dct=object_data.TechSecurityContract.TypeDocument,
+                            branch=contract_data.Branch, scompany=contract_data.ServingCompany,
+                            date_event=datetime.strptime(
+                                    '01.' + datetime.today().month.__str__() + '.' + datetime.today().year.__str__(),
+                                    "%d.%m.%Y"), summ=get_price_object(object))
+
+                return redirect('addget_contract', pk={contract_data.Branch.id, contract_id})
+        else:
+            print(formset.errors)
+    else:
+        formset = ObjectsDeactivatedFormSet(queryset=queryset)
+
+    return render(request, 'objects_groupactions.html', {
+        'title': 'Постановка объектов в охрану',
+        'title_area': 'Договор техохраны №%s от %s' % (contract_data.NumContractInternal, contract_data.DateConclusion),
+        'title_small': 'Групповая обработка объектов',
+        'formset': formset,
+        'contract_data': contract_data,
+        'url': reverse('tech_security:objects_activate', kwargs={'contract_id': contract_id})
+    })
+
+
+@login_required
+@csrf_protect
+def objects_deactivate(request, contract_id):
+    contract_data = TechSecurityContract.objects.get(id=contract_id)
+
+    queryset = TechSecurityObject.objects.\
+        filter(TechSecurityContract=TechSecurityContract.objects.get(id=contract_id),
+               StatusSecurity=StatusSecurity.objects.get(slug='active'))
+
+    if request.POST:
+        formset = ObjectsDeactivatedFormSet(request.POST, queryset=queryset)
+        if formset.is_valid():
+            date_event = request.POST('date_event')
+            objects = request.POST.getlist('sel_object')
+
+            if date_event and objects:
+                for object in objects:
+                    # снимаем с охраны
+                    # закрываем период охраны
+                    object_data = TechSecurityObject.objects.get(id=object)
+                    period_tech_security(
+                        object_data, date_event, Event.objects.get(slug='change_deactivationSecur_object'),
+                        get_price_object(object), object_data.PriceNoDifferent)
+                    # запись в события о снятии с охраны
+                    logging_event('change_deactivationSecur_object', date_event, object_data.StatusSecurity, apps_name,
+                                  request.user.username, contract_data.TypeDocument.slug,
+                                  contract_data.ServingCompany, contract_data.Branch.id,
+                                  object_data.TechSecurityContract.id, object_data.id)
+                    # перерасчёт
+                    if object_data.ChgPriceDifferent is False:
+                        recalculation(request.user.username, object, contract_data.id,
+                                      contract_data.TypeDocument, contract_data.Branch,
+                                      contract_data.ServingCompany, date_event, get_price_object(object),
+                                      object_data.PriceNoDifferent, 'change_deactivationSecur_object')
+
+                return redirect('addget_contract', pk={contract_data.Branch.id, contract_id})
+        else:
+            print(formset.errors)
+    else:
+        formset = ObjectsDeactivatedFormSet(queryset=queryset)
+
+    return render(request, 'objects_groupactions.html', {
+        'title': 'Снятие объектов с охраны',
+        'title_area': 'Договор техохраны №%s от %s' % (contract_data.NumContractInternal, contract_data.DateConclusion),
+        'title_small': 'Групповая обработка объектов',
+        'formset': formset,
+        'contract_data': contract_data,
+        'url': reverse('tech_security:objects_activate', kwargs={'contract_id': contract_id})
+    })
+
+
 def object_pricedifferent(request, object_id):
     old_price = ''
     object_data = TechSecurityObject.objects.get(id=object_id)
@@ -777,7 +878,7 @@ def upload_object_pdf(request, branch_id=None, contract_id=None, file_id=None):
 
 
 @login_required
-def view_contract_template(request, branch_id=None, contract_id=None):
+def view_contract_template(request, contract_id=None):
     i = 0
     list_objects = ''
 
@@ -840,7 +941,7 @@ def view_contract_template(request, branch_id=None, contract_id=None):
             exp_units=exp_units) + ')'
     })
     text = text_template.render(tags)
-    TechSecurityContract.objects.filter(id=contract_id).update(TextContract=text)
+    # TechSecurityContract.objects.filter(id=contract_id).update(TextContract=text)
 
     return render(request, 'view_template.html', {
         'title': 'Печатная форма договора ',
@@ -848,12 +949,12 @@ def view_contract_template(request, branch_id=None, contract_id=None):
         'contract': contract,
         'area': 'Техническая охрана',
         'title_small': 'Печать',
-        'text': contract.TextContract}
+        'text': text}
     )
 
 
 @login_required
-def view_checklist_contract(request, branch_id=None, contract_id=None):
+def view_checklist_contract(request, contract_id=None):
     i = 0
 
     contract = TechSecurityContract.objects.get(id=contract_id)
@@ -918,7 +1019,7 @@ def view_checklist_contract(request, branch_id=None, contract_id=None):
         'TotalCountObjects': objects.count()
     })
     text = text_template.render(tags)
-    TechSecurityContract.objects.filter(id=contract_id).update(TextContract=text)
+    # TechSecurityContract.objects.filter(id=contract_id).update(TextContract=text)
 
     return render(request, 'view_template.html', {
         'title': 'Чек-лист договора ',
@@ -926,11 +1027,12 @@ def view_checklist_contract(request, branch_id=None, contract_id=None):
         'contract': contract,
         'area': 'Техническая охрана',
         'title_small': 'Печать',
-        'text': contract.TextContract})
+        'text': text}
+    )
 
 
 @login_required
-def view_subcontract_template(request, branch_id=None, contract_id=None, subcontract_id=None):
+def view_subcontract_template(request, subcontract_id=None):
     args = {}
     i = 0
     int_units = ((u'рубль', u'рубля', u'рублей'), 'm')
